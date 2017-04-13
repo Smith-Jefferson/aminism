@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/douban" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douban/src/main/java/spider/pool/DatabaseConnectPool.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/douban/src/test/java/spider/AppTest.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douban/src/test/java/spider/model/DoubanbookEntityTest.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/douban/src/test/java/spider/model/DoubanbookReviewEntityTest.java" charset="UTF-8" />
+  </component>
+</project>
