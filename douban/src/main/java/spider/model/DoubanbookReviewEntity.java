@@ -84,6 +84,8 @@ public class DoubanbookReviewEntity {
     }
 
     public void setReview(String review) {
+        if(review!=null && review.trim()!="")
+            review=review.replaceAll("[\ud800\udc00-\udbff\udfff\ud800-\udfff]", "");
         this.review = review;
     }
 

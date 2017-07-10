@@ -9,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spider.App;
 import spider.model.DoubanbookReviewCommentEntity;
+import spider.model.LogLevel;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
+import spider.service.LogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -28,7 +30,7 @@ public class DoubanBookReviewComment implements Runnable{
     private int current=1;
     public DoubanBookReviewComment(String url) {
         baseUrl=url;
-        this.doc= SpiderTool.Getdoc(url,3);
+        this.doc= SpiderTool.Getdoc(url,3,false);
     }
 
     public DoubanBookReviewComment(Document doc) {
@@ -53,6 +55,11 @@ public class DoubanBookReviewComment implements Runnable{
 
     @Override
     public void run() {
+        try {
+            Thread.sleep(4000);
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
         Elements comments=doc.select("div#comments").select("div.comment-item");
         task(comments);
         Elements pages=doc.select("div.paginator");
@@ -71,38 +78,54 @@ public class DoubanBookReviewComment implements Runnable{
         while(max>current){
             String url=baseUrl+"?start="+current*100;
             current++;
-            doc=SpiderTool.Getdoc(url,3);
-            comments=doc.select("div#comments").select("div.comment-item");
-            task(comments);
+            try {
+                try {
+                    Thread.sleep(4000);
+                }catch (Exception e){
+                    log.error(e.getMessage(),e);
+                }
+                doc=SpiderTool.Getdoc(url,3,false);
+                comments=doc.select("div#comments").select("div.comment-item");
+                task(comments);
+            } catch (Exception e) {
+                log.error(e.getStackTrace().toString());
+                LogManager.writeLog(e, LogLevel.FATAL,url);
+            }
         }
     }
 
     public void task(Elements comments){
-        Session session= SessionPool.getSession();
-        Transaction transaction=session.beginTransaction();
+        Session session=null;
         StringBuilder str=new StringBuilder();
         for (Element el:comments) {
-            DoubanbookReviewCommentEntity commet=new DoubanbookReviewCommentEntity();
-            String doubanuserid= getDoubanUserid(el);
-            UserEntity user=new UserEntity();
-            user.setDoubanuserid(doubanuserid);
-            user.setAvatar(getAvatar(el));
-            user.setFlag(0);
-            user.setUname(getUserName(el));
-            long userid=user.getUserID(user);
-            commet.setBookid(getBookid());
-            commet.setReviewid(getReviewid());
-            commet.setUserid(userid);
-            commet.setDoubanuserid(doubanuserid);
-            commet.setComment(getComment(el));
-            commet.setRatedate(getRatedate(el));
-            if(!App.getBloomFilter().contains(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
-                session.save(commet);
+            try {
+                session= SessionPool.getSession();
+                DoubanbookReviewCommentEntity commet=new DoubanbookReviewCommentEntity();
+                String doubanuserid= getDoubanUserid(el);
+                UserEntity user=new UserEntity();
+                user.setDoubanuserid(doubanuserid);
+                user.setAvatar(getAvatar(el));
+                user.setFlag(0);
+                user.setUname(getUserName(el));
+                long userid=user.getUserID(user);
+                commet.setBookid(getBookid());
+                commet.setReviewid(getReviewid());
+                commet.setUserid(userid);
+                commet.setDoubanuserid(doubanuserid);
+                commet.setComment(getComment(el));
+                commet.setRatedate(getRatedate(el));
+                if(!App.getBloomFilter().ContainedThenAdd(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
+                    Transaction transaction=session.beginTransaction();
+                    session.save(commet);
+                    transaction.commit();
+                }
                 str.delete(0,str.length());
+            }catch (Exception e){
+                log.error(el.toString()+e.getMessage(),e);
+            }finally {
+                SessionPool.freeSession(session);
             }
         }
-        transaction.commit();
-        SessionPool.freeSession(session);
     }
 
     public String getDoubanUserid(Element el){

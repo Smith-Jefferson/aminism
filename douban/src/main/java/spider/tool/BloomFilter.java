@@ -18,6 +18,22 @@ public class BloomFilter {
       bitSet.set(key3);
   }
 
+  public boolean ContainedThenAdd(String url){
+      if (url == null) {
+          return true;
+      }
+      int key1 = hashA(url);
+      int key2 = hashB(url);
+      int key3 = hashC(url);
+      if (bitSet.get(key1) && bitSet.get(key2) && bitSet.get(key3)) {
+          return true;
+      }
+      bitSet.set(key1);
+      bitSet.set(key2);
+      bitSet.set(key3);
+      return false;
+  }
+
   public  boolean contains(String url) {
       if (url == null) {
           return true;

@@ -69,7 +69,7 @@ public class TrendsAmazonItemDetial implements Runnable {
 		SpiderTool tool=new SpiderTool();
 		TrendAmazonDataOp dataOp=new TrendAmazonDataOp();
 		try {
-			Document doc=tool.Getdoc(url,2);
+			Document doc=tool.Getdoc(url,2,false);
 			TrendsAmazonItemDetial detail=new TrendsAmazonItemDetial();
 			 String asin=detail.getAsin(doc);
 			 if(asin==null||asin.isEmpty())

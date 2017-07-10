@@ -22,12 +22,14 @@ public class DoubanConnect {
     private volatile static Map cookies;
     private volatile boolean status=true;
     private Connection con;
+    public static boolean isLogin=false;
     public Connection getConnection() throws Exception{
         if(con==null)
             setCon();
         if(cookies==null){
             log.info("建立新的联接...");
-            login("zhishanghan@qq.com","xieyigang123");
+            //if(isLogin)
+                //login("zhishanghan@qq.com","xieyigang123");
         }else {
             setCon();
             con.cookies(cookies);
@@ -47,13 +49,12 @@ public class DoubanConnect {
         System.getProperties().setProperty("http.proxyHost", proxy.get("host")!=null?proxy.get("host"): InetAddress.getLocalHost().getHostAddress());
         System.getProperties().setProperty("http.proxyPort", proxy.get("port")!=null?proxy.get("port"):"80");
         this.con= Jsoup.connect("https://www.douban.com/accounts/login");
-        this.con.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0");
+        this.con.header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12.4; U; fr) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31");
         this.con.timeout(300 * 1000);
     }
     public void login(String userName,String pwd) {
         try{
-            if(con==null)
-                setCon();
+            setCon();
             Connection.Response rs= con.execute();//获取响应
             Document d1=Jsoup.parse(rs.body());//转换为Dom树
             List<Element> et= d1.select("form#lzform");//获取form表单，可以通过查看页面源码代码得知
@@ -74,12 +75,13 @@ public class DoubanConnect {
                 if(e.attr("name").equals("source")){
                     e.attr("value","book");
                 }
+                /*
                 if(e.attr("name").equals("captcha-solution")){
                     String imgurl=d1.select("img#captcha_image").attr("src");
                     String captcha=SpiderTool.RecognizeCaptcha(imgurl);
                     e.attr("value",captcha);
                 }
-
+                */
                 if(e.attr("name").length()>0){//排除空值表单属性
                     datas.put(e.attr("name"), e.attr("value"));
                 }
@@ -98,7 +100,7 @@ public class DoubanConnect {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            log.error(e.getMessage());
+            log.error(e.getMessage(),e);
         }
 
     }

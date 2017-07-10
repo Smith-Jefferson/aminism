@@ -81,6 +81,8 @@ public class DoubanbookCommentEntity {
     }
 
     public void setComment(String comment) {
+        if(comment!=null && comment.trim()!="")
+            comment=comment.replaceAll("[\\ud800\\udc00-\\udbff\\udfff\\ud800-\\udfff]", "*");
         this.comment = comment;
     }
 

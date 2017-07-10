@@ -6,7 +6,7 @@
 <session-factory>
     <property name="connection.url">jdbc:mysql://localhost:3306/aminism</property>
     <!-- 使用Unicode访问数据库-->
-    <property name="connection.useUnicode">true</property>
+    <property name="connection.useUnicode">false</property>
 
     <!-- 连接数据库时数据的传输字符集编码方式 -->
     <property name="connection.characterEncoding">UTF-8</property>
@@ -31,5 +31,6 @@
     <mapping class="spider.model.UserEntity"/>
     <mapping class="spider.model.DoubanrateEntity"/>
     <mapping class="spider.model.DoubanbookOfferEntity"/>
+    <mapping class="spider.model.LogEntity"/>
 </session-factory>
 </hibernate-configuration>

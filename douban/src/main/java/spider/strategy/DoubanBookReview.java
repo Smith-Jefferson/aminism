@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spider.App;
 import spider.model.DoubanbookReviewEntity;
+import spider.model.LogLevel;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
+import spider.service.LogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -46,31 +48,40 @@ public class DoubanBookReview implements Runnable {
         else
             url=baseurl;
         start+=20;
-        Document doc= SpiderTool.Getdoc(url,3);
-        int counts=Integer.parseInt(SpiderTool.removeZh(doc.select("div#content").select("h1").text().replace("(","").replace(")","")).trim());
+        try {
+            Thread.sleep(4000);
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+        Document doc= SpiderTool.Getdoc(url,3,false);
+        int counts=Integer.parseInt(SpiderTool.removeZh(doc.select("div#content").select("h1").text().replace("(","").replace(")","")).replace(",","").trim());
+        if(counts<=0)
+            return;
         if(reviewsUrl==null)
             reviewsUrl=new ArrayList<>(counts);
         Elements elements=doc.select("div.review-list").select("div.review-item").select("header");
         for (Element el:elements) {
             reviewsUrl.add(el.select(".title").select("a[href]").attr("abs:href"));
         }
-        if(start<counts)
-            task(baseurl);
-        else{
-            Session session= SessionPool.getSession();
-            Transaction transaction=session.beginTransaction();
-            UserEntity user;
-            StringBuilder str=new StringBuilder();
-            for (String reviewUrl:reviewsUrl) {
+
+        Session session;
+        UserEntity user;
+        StringBuilder str=new StringBuilder();
+        for (String reviewUrl:reviewsUrl) {
+            try{
                 str.delete(0,str.length());
-                Document review= SpiderTool.Getdoc(reviewUrl,3);
+
+                Document review= SpiderTool.Getdoc(reviewUrl,3,false);
                 DoubanbookReviewEntity bookreview=new DoubanbookReviewEntity();
                 user=new UserEntity();
                 user.setDoubanuserid(getDoubanuserid(review));
                 user.setUname(getUserName(review));
                 user.setAvatar(getUserAvatar(review));
                 user.setFlag(0);
-                bookreview.setUserid(user.getUserID(user));
+                long userid=user.getUserID(user);
+
+                session= SessionPool.getSession();
+                bookreview.setUserid(userid);
                 bookreview.setDoubanuserid(user.getDoubanuserid());
                 bookreview.setUrl(reviewUrl);
                 bookreview.setBookid(bookid);
@@ -81,23 +92,33 @@ public class DoubanBookReview implements Runnable {
                 bookreview.setRatedate(getRatedate(review));
                 bookreview.setReviewRecusers(getReviewRecusers(reviewUrl));
                 bookreview.setReviewLikeuser(getReviewLikeuser(reviewUrl));
-                if(!App.getBloomFilter().contains(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString())){
+                if(!App.getBloomFilter().ContainedThenAdd(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString())){
                     session.save(bookreview);
-                    try{
-                        DoubanBookReviewComment reviewComment=new DoubanBookReviewComment(review);
-                        reviewComment.setBookid(bookid);
-                        reviewComment.setBaseUrl(reviewUrl);
-                        Thread bookReviewComment=new Thread(reviewComment);
-                        bookReviewComment.start();
-                    }catch(Exception e){
-                        log.error(e.getMessage());
-                    }
                 }
+                try{
+                    Transaction transaction=session.beginTransaction();
+                    transaction.commit();
+                    DoubanBookReviewComment reviewComment=new DoubanBookReviewComment(review);
+                    reviewComment.setBookid(bookid);
+                    reviewComment.setBaseUrl(reviewUrl);
+                    App.fixedThreadPool.execute(reviewComment);
+                    //reviewComment.run();
+                }catch(Exception e){
+                    log.error(e.getStackTrace().toString());
+                    LogManager.writeLog(e);
+                }finally {
+                    SessionPool.freeSession(session);
+                }
+
             }
-            transaction.commit();
-            SessionPool.freeSession(session);
-            log.info("记录书评条数："+counts);
+            catch (Exception e){
+                log.error(e.getStackTrace().toString());
+                LogManager.writeLog(e, LogLevel.FATAL,reviewUrl);
+            }
         }
+        if(start<counts)
+            task(baseurl);
+        log.info("记录书评条数："+counts);
     }
 
     public String getTitle(Document doc){
@@ -152,7 +173,7 @@ public class DoubanBookReview implements Runnable {
     public String getReviewRecusers(String url) {
         String reviewRecusers=null;
         try{
-            Document doc=SpiderTool.Getdoc(url+"?tab=recommendations",3);
+            Document doc=SpiderTool.Getdoc(url+"?tab=recommendations",3,true);
             Elements recUs=doc.select("div#recommendations").select("div.review-rec-list").select("li");
             UserEntity user;
             int recN=0;
@@ -161,16 +182,18 @@ public class DoubanBookReview implements Runnable {
                 user=new UserEntity();
                 String userid=el.select("div.content").select("a[href]").attr("abs:href").split("people/")[1].replace("/","");
                 user.setDoubanuserid(userid);
-                String uname=el.select("div.content").select("a[href]").text();
+                String uname=el.select("div.pic").select("img").attr("alt");
+                //user.setInserttime(DateUtil.string2Time(el.select("div.content").select("a[href]").first().child(0).text(),"yyyy-MM-dd"));
                 user.setUname(uname);
                 String avatar=el.select("div.pic").select("img").attr("src");
                 user.setAvatar(avatar);
                 user.setFlag(0);
-                userids[++recN]=user.getUserID(user);
+                userids[recN++]=user.getUserID(user);
             }
             reviewRecusers=Joiner.on(",").join(userids).toString();
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getStackTrace().toString());
+            LogManager.writeLog(e, LogLevel.FATAL,url);
         }
         return reviewRecusers;
     }
@@ -178,7 +201,7 @@ public class DoubanBookReview implements Runnable {
     public String getReviewLikeuser(String url) {
         String reviewLikeuser=null;
         try{
-            Document doc=SpiderTool.Getdoc(url+"?tab=likes#likes",3);
+            Document doc=SpiderTool.Getdoc(url+"?tab=likes#likes",3,true);
             Elements likeUs=doc.select("div#likes").select("div.review-fav-list").select("li");
             UserEntity user;
             int recN=0;
@@ -187,27 +210,30 @@ public class DoubanBookReview implements Runnable {
                 user=new UserEntity();
                 String userid=el.select("a[href]").attr("abs:href").split("people/")[1].replace("/","");
                 user.setDoubanuserid(userid);
-                String uname=el.select("a[href]").text();
+                String uname= el.select("div.pic").select("img").attr("alt");
+                //user.setInserttime(DateUtil.string2Time(el.select("div.content").select("a[href]").first().child(0).text(),"yyyy-MM-dd"));
                 user.setUname(uname);
                 String avatar=el.select("div.pic").select("img").attr("src");
                 user.setAvatar(avatar);
                 user.setFlag(0);
-                userids[++recN]=user.getUserID(user);
+                userids[recN++]=user.getUserID(user);
             }
             reviewLikeuser=Joiner.on(",").join(userids).toString();
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getStackTrace().toString());
+            LogManager.writeLog(e, LogLevel.FATAL,url);
         }
         return reviewLikeuser;
     }
 
     private Timestamp getRatedate(Document doc){
-        String date=doc.select("header").select("span").text();
+        String date=doc.select("header").select("span").last().text();
         Timestamp time= null;
         try {
             time = DateUtil.string2Time(date,"yyyy-MM-dd HH:mm:ss");
         } catch (ParseException e) {
-            log.error(e.getMessage());
+            log.error(e.getStackTrace().toString());
+            LogManager.writeLog(e, LogLevel.FATAL,url);
         }
         return time;
     }

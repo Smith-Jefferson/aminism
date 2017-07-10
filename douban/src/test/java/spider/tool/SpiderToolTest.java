@@ -30,7 +30,7 @@ public void after() throws Exception {
 */ 
 @Test
 public void testGetdoc() throws Exception {
-    Document doc= SpiderTool.Getdoc("https://book.douban.com/",3);
+    Document doc= SpiderTool.Getdoc("https://book.douban.com/",3,false);
     System.out.print(doc.toString());
 } 
 

@@ -19,9 +19,9 @@ import java.util.List;
  */
 public class InitailTask {
     public static void initailDoubanBook(){
-        List<String> bookurls= DoubanDataRep.getDoubanBook();
-        for(String url:bookurls){
-            App.getBloomFilter().add(url);
+        List<Long> bookIDs= DoubanDataRep.getDoubanBook();
+        for(long bookID:bookIDs){
+            App.getBloomFilter().add(bookID+"");
         }
     }
     public static void initailDoubanBookComment(){

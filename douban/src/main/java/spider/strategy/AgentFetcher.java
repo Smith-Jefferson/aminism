@@ -38,7 +38,7 @@ public class AgentFetcher implements Runnable{
             for (int i = 1; i <=maxnum; i++) {
                 String url=agentUrl+i;
                 try{
-                    doc= SpiderTool.Getdoc(url,3);
+                    doc= SpiderTool.Getdoc(url,3,false);
                     if(doc==null)
                         break;
                     if(i==1)
@@ -75,7 +75,7 @@ public class AgentFetcher implements Runnable{
             for (int i = 1; i <=maxnum ; i++) {
                 String url=agentUrl+i;
                 try{
-                    doc= SpiderTool.Getdoc(url,3);
+                    doc= SpiderTool.Getdoc(url,3,false);
                     if(doc==null)
                         break;
                     if(i==1)

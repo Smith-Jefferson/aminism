@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spider.App;
 import spider.model.DoubanbookEntity;
+import spider.model.LogLevel;
 import spider.pool.SessionPool;
+import spider.service.LogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -37,16 +39,17 @@ public class DoubanBookDetail implements Runnable {
             try{
                 task(url);
             }catch (Exception e){
-                log.error(e.getMessage());
+                log.error(e.getMessage(),e);
+                LogManager.writeLog(e, LogLevel.FATAL,url);
             }
 
         }
-        log.info(Thread.currentThread().getName() + ":"  + "结束");
+        log.info(Thread.currentThread().getName() + ":"  + "结束",Thread.currentThread());
     }
 
     public void task(String url) throws Exception{
         doubanbook=new DoubanbookEntity();
-        Document doc= SpiderTool.Getdoc(url,3);
+        Document doc= SpiderTool.Getdoc(url,3,false);
         setRate(doc);
         setExtention(doc);
         setBookid(url);
@@ -68,34 +71,53 @@ public class DoubanBookDetail implements Runnable {
         setBookname(doc);
         setAuthorintro(doc);
         Session session= SessionPool.getSession();
-        Transaction transaction=session.beginTransaction();
-        if(App.getBloomFilter().contains(doubanbook.getUrl())){
-            session.update(doubanbook);
-        }else{
-            session.save(doubanbook);
+        try {
+            Transaction transaction=session.beginTransaction();
+            if(App.getBloomFilter().ContainedThenAdd(doubanbook.getBookid()+"")){
+                session.update(doubanbook);
+            }else{
+                session.save(doubanbook);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            log.error(e.getStackTrace().toString());
+            LogManager.writeLog(e);
+        }finally {
+            SessionPool.freeSession(session);
         }
-        transaction.commit();
-        SessionPool.freeSession(session);
         log.info("获取该书的短评");
         DoubanBookComment comment=new DoubanBookComment(url+"/comments/");
-        comment.run();
-        ///
-        Thread bookcomment=new Thread(comment);
-        bookcomment.start();
+        try {
+            App.fixedThreadPool.execute(comment);
+            //comment.run();
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+        }
+
         log.info("获取该书的书评");
-        DoubanBookReview review=new DoubanBookReview(url+"reviews");
-        Thread bookview=new Thread(review);
-        bookview.start();
+        DoubanBookReview review=new DoubanBookReview(url+"/reviews");
+        try {
+            App.fixedThreadPool.execute(review);
+            //review.run();
+        } catch (Exception e) {
+            log.error(e.getStackTrace().toString());
+            LogManager.writeLog(e,LogLevel.FATAL,url+"/reviews");
+        }
         Elements ems=doc.getElementsContainingText("二手书欲转让");
         if(ems!=null && ems.size()>0){
             String offerurl=ems.select("a[href]").last().attr("abs:href");
             DoubanbookOffer offer=new DoubanbookOffer(offerurl);
-            Thread bookoffer=new Thread(offer);
-            bookoffer.start();
-            bookoffer.join();
+            //offer.run();
+            try{
+                App.fixedThreadPool.execute(offer);
+                //bookoffer.join();
+            }catch (Exception e)
+            {
+                log.error(e.getMessage(),e);
+            }
+
         }
-        bookview.join();
-        bookcomment.join();
+        SessionPool.freeSession(session);
     }
 
     public void setBooks(String[] books) {
@@ -158,7 +180,7 @@ public class DoubanBookDetail implements Runnable {
         Elements els=doc.select("div#info").select("span");
         for (Element el:els){
             if("定价:".equals(el.text())) {
-                String price = el.nextSibling().outerHtml().replace("元","").trim();
+                String price = el.nextSibling().outerHtml().replace("元","").replace("CNY","").replace("RMB","").trim();
                 doubanbook.setPrice(Double.valueOf(price));
                 break;
             }
@@ -178,6 +200,8 @@ public class DoubanBookDetail implements Runnable {
 
     public void setBookintro(Document doc) {
         String intro=doc.select("div.related_info").select("div#link-report").select("span.all").select("div.intro").html();
+        if("".equals(intro))
+            intro=doc.select("div.related_info").select("div#link-report").select("div.intro").html();
         doubanbook.setBookintro(intro);
     }
 
@@ -188,6 +212,9 @@ public class DoubanBookDetail implements Runnable {
 
     public void setMenu(Document doc) {
         String menu=doc.select("div#dir_"+doubanbook.getBookid()+"_full").html();
+        if(!"".equals(menu)) {
+            menu=menu.substring(0,menu.lastIndexOf("<a")-14);
+        }
         doubanbook.setMenu(menu);
     }
 
@@ -197,11 +224,12 @@ public class DoubanBookDetail implements Runnable {
             String url=el.absUrl("href");
             if(url!=null && url.contains("book")&&url.contains("reading")){
                 url="https://book.douban.com/reading/"+doubanbook.getBookid()+"/";
-                Document sample= SpiderTool.Getdoc(url,3);
+                Document sample= SpiderTool.Getdoc(url,3,false);
                 try{
                     doubanbook.setSample(sample.select("div#content").select("div.book-info").text());
                 }catch (Exception e){
                     log.warn(e.getMessage());
+                    LogManager.writeLog(e,LogLevel.WARM,null);
                 }
             }
         }
@@ -264,21 +292,26 @@ public class DoubanBookDetail implements Runnable {
         Elements rating_wrap=doc.select("div.rating_wrap");
         JSONObject jsonObject = new JSONObject();
         String ratenum=rating_wrap.select("div.rating_self").select("strong.rating_num").text();
-        jsonObject.put("ratenum",Float.valueOf(ratenum));
-        Elements rating_per=rating_wrap.select("span.rating_per");
-        jsonObject.put("stars5",rating_per.get(0).text());
-        jsonObject.put("stars4",rating_per.get(1).text());
-        jsonObject.put("stars3",rating_per.get(2).text());
-        jsonObject.put("stars2",rating_per.get(3).text());
-        jsonObject.put("stars1",rating_per.get(4).text());
-        doubanbook.setRate(JSON.toJSONString(jsonObject));
+        if("".equals(ratenum)){
+            doubanbook.setRate(null);
+        }
+        else {
+            jsonObject.put("ratenum",Float.valueOf(ratenum));
+            Elements rating_per=rating_wrap.select(".rating_per");
+            Elements rating_label=rating_wrap.select(".starstop");
+            for (int i = 0; i <rating_per.size() ; i++) {
+                jsonObject.put(rating_label.get(i).text(),rating_per.get(i).text());
+            }
+            doubanbook.setRate(JSON.toJSONString(jsonObject));
+        }
+
     }
 
     public void setExtention(Document doc){
         //从哪里可以借到书
         JSONObject jsonObject = new JSONObject();
         Elements borrowinfo= doc.select("div#borrowinfo");
-        if(borrowinfo!=null){
+        if(borrowinfo.size()>0){
             borrowinfo=borrowinfo.select("ul>li");
             List<JSONObject> libs=new ArrayList<>(borrowinfo.size());
             for (Element info:borrowinfo) {
@@ -297,7 +330,9 @@ public class DoubanBookDetail implements Runnable {
             jsonObject.put("borrow",libs);
         }
         Elements buyinfo=doc.select("div#buyinfo");
-        if(buyinfo!=null){
+        if(buyinfo.size()==0)
+            buyinfo=doc.select("#buyinfo-printed");
+        if(buyinfo.size()>0){
             buyinfo=buyinfo.select("ul>li").select("a[href]");
             List<JSONObject> editions=new ArrayList<>(borrowinfo.size());
             for (Element info:buyinfo){

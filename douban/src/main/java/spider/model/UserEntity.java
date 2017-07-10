@@ -50,10 +50,13 @@ public class UserEntity {
     public long getUserID(UserEntity user){
         StringBuilder str=new StringBuilder();
         long userid=0;
-        if(App.getBloomFilter().contains(str.append(user.getDoubanuserid()).append(user.getUname()).toString())){
+        if(App.getBloomFilter().ContainedThenAdd(str.append(user.getDoubanuserid()).append(user.getUname()).toString())){
             List<UserEntity> tmp= DoubanDataRep.getUsersByName(user.getUname(),user.getDoubanuserid());
-            userid= tmp.get(0).getUserid();
-        }else{
+            if(tmp!=null && tmp.size()>0)
+                userid= tmp.get(0).getUserid();
+        }
+        if(userid==0)
+        {
             Session session= SessionPool.getSession();
             Transaction transaction=session.beginTransaction();
             session.save(user);
@@ -93,6 +96,8 @@ public class UserEntity {
     }
 
     public void setUname(String uname) {
+        if(uname!=null && uname.trim()!="")
+            uname=uname.replaceAll("[\\ud800\\udc00-\\udbff\\udfff\\ud800-\\udfff]", "*");
         this.uname = uname;
     }
 

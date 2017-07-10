@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import spider.model.DoubanbookOfferEntity;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
+import spider.service.LogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -37,39 +38,52 @@ public class DoubanbookOffer implements Runnable{
 
     @Override
     public void run() {
-        Document doc= SpiderTool.Getdoc(url,3);
+        Document doc= SpiderTool.Getdoc(url,3,false);
         int current=1;
         getMaxpage(doc);
         task(doc);
         while(max>current){
-            doc= SpiderTool.Getdoc(url+"?start="+15*current++,3);
+            doc= SpiderTool.Getdoc(url+"?start="+15*current++,3,false);
             task(doc);
         }
     }
     public void task(Document doc){
-        Session session= SessionPool.getSession();
-        Transaction transaction=session.beginTransaction();
+        Session session;
+        Transaction transaction;
         Elements content=doc.select("div#content");
         if(content!=null){
             content=content.select("table");
-            content.remove(0);
-            for (Element el:content) {
-                DoubanbookOfferEntity offer=new DoubanbookOfferEntity();
-                UserEntity user=new UserEntity();
-                user.setFlag(0);
-                user.setAvatar(getAvatar(el));
-                user.setDoubanuserid(getDoubanuserid(el));
-                user.setUname(getUname(el));
-                long userid=user.getUserID(user);
-                offer.setUserid(userid);
-                offer.setBookid(getBookid(url));
-                offer.setPrice(getPrice(el));
-                offer.setOfferdate(getDate(el));
-                offer.setMark(getRemark(el));
-                session.save(offer);
+            if (content.size()>0)
+            {
+                content.remove(0);
+                for (Element el:content) {
+                    try{
+                        session= SessionPool.getSession();
+                        DoubanbookOfferEntity offer=new DoubanbookOfferEntity();
+                        UserEntity user=new UserEntity();
+                        user.setFlag(0);
+                        user.setAvatar(getAvatar(el));
+                        user.setDoubanuserid(getDoubanuserid(el));
+                        user.setUname(getUname(el));
+                        long userid=user.getUserID(user);
+                        offer.setUserid(userid);
+                        offer.setBookid(getBookid(url));
+                        offer.setPrice(getPrice(el));
+                        offer.setOfferdate(getDate(el));
+                        offer.setMark(getRemark(el));
+                        transaction=session.beginTransaction();
+                        session.save(offer);
+                        transaction.commit();
+                        //SessionPool.freeSession(session);
+                    }
+                    catch (Exception e){
+                        log.error(e.getStackTrace().toString());
+                        LogManager.writeLog(e);
+                    }
+
+                }
             }
-            transaction.commit();
-            SessionPool.freeSession(session);
+
         }
     }
 

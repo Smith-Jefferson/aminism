@@ -14,10 +14,10 @@ import java.util.List;
  * Created by hello world on 2017/1/11.
  */
 public class DoubanDataRep {
-    public static List<String> getDoubanBook(){
-        String Hsql="select url from DoubanbookEntity";
+    public static List<Long> getDoubanBook(){
+        String Hsql="select bookid from DoubanbookEntity";
         Session session= SessionPool.getSession();
-        Query<String> query = session.createQuery(Hsql,String.class);
+        Query<Long> query = session.createQuery(Hsql,Long.class);
         SessionPool.freeSession(session);
         return query.getResultList();
     }

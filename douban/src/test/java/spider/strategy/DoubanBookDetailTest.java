@@ -12,6 +12,7 @@ import org.junit.Test;
 * @version 1.0 
 */ 
 public class DoubanBookDetailTest {
+    private static String url="https://book.douban.com/subject/27046739";
     @Before
     public void before() throws Exception {
     }
@@ -22,7 +23,7 @@ public class DoubanBookDetailTest {
     }
     @Test
     public void taskTest(){
-        String[] books={"https://book.douban.com/subject/1080370/"};
+        String[] books={url};
         DoubanBookDetail bookDetail=new DoubanBookDetail(books);
         bookDetail.run();
     }

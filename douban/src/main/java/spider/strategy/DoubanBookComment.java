@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 import spider.App;
 import spider.database.DoubanDataRep;
 import spider.model.DoubanbookCommentEntity;
+import spider.model.LogLevel;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
+import spider.service.LogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -32,44 +34,63 @@ public class DoubanBookComment implements Runnable{
     public DoubanBookComment(String url) {
         this.url = url;
     }
-
+    DoubanbookCommentEntity comment;
     @Override
     public void run() {
         setBookid(url);
-        task(url);
+        try {
+            task(url);
+        }
+        catch (Exception e) {
+            log.error(e.getStackTrace().toString());
+            LogManager.writeLog(e, LogLevel.FATAL,url);
+        }
     }
 
     public void task(String url){
-        Document doc= SpiderTool.Getdoc(url,3);
+        Document doc= SpiderTool.Getdoc(url,3,false);
         Elements elements=doc.select("div#comments").select("li.comment-item");
-        Session session= SessionPool.getSession();
-        Transaction transaction=session.beginTransaction();
         UserEntity user;
+        Session session;
         for (Element el:elements) {
-            DoubanbookCommentEntity comment=new DoubanbookCommentEntity();
+            comment=new DoubanbookCommentEntity();
             user=new UserEntity();
             comment.setId(++count);
             user.setDoubanuserid(getDoubanuserid(el));
             user.setUname(getUserName(el));
             user.setAvatar(getUserAvatar(el));
             user.setFlag(0);
-            comment.setUserid(user.getUserID(user));
-            comment.setBookid(bookID);
-            comment.setDoubanuserid(user.getDoubanuserid());
-            comment.setRate(getRate(el));
-            comment.setComment(getComment(el));
-            comment.setRatedate(getRateDate(el));
-            comment.setFollownum(getFollownum(el));
-            if(!App.getBloomFilter().contains(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString())){
-                session.save(comment);
+            long userid=user.getUserID(user);
+            try {
+                session= SessionPool.getSession();
+                comment.setUserid(userid);
+                comment.setBookid(bookID);
+                comment.setDoubanuserid(user.getDoubanuserid());
+                comment.setRate(getRate(el));
+                comment.setComment(getComment(el));
+                comment.setRatedate(getRateDate(el));
+                comment.setFollownum(getFollownum(el));
+                if(!App.getBloomFilter().ContainedThenAdd(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString())){
+                    Transaction transaction=session.beginTransaction();
+                    session.save(comment);
+                    transaction.commit();
+                    SessionPool.freeSession(session);
+                }
+            }catch (Exception e){
+                log.error(el.toString(),e);
+                LogManager.writeLog(e, LogLevel.FATAL,el.toString());
             }
+
             str.delete(0,str.length());
         }
-        transaction.commit();
         log.info("记录短评条数："+count);
-        SessionPool.freeSession(session);
         pageCount=Integer.parseInt(SpiderTool.removeZh(doc.select("span#total-comments").text()).trim());
         if(currentPage++<(int)Math.ceil((double)pageCount/(double) 20)){
+            try {
+                Thread.sleep(4000);
+            }catch (Exception e){
+                log.error(e.getMessage(),e);
+            }
             task(url+"hot?p="+currentPage);
         }
     }

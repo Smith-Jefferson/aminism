@@ -56,9 +56,6 @@ public class SpiderTool {
 		proxy.put("port",agent[down.getAndIncrement()][1]);
 		return proxy;
 	}
-	public  SpiderTool(){
-		System.setProperty("webdriver.chrome.driver", "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
-	}
 	public static synchronized void setAgent(String host,String port) {
 		if(up.get()>agent.length)
 			up=new AtomicInteger(0);
@@ -66,12 +63,15 @@ public class SpiderTool {
 		agent[up.getAndIncrement()][1]=port;
 	}
 
-	public static Document Getdoc(String oneListUrl, int tryTime){
+	public static Document Getdoc(String oneListUrl, int tryTime,boolean isNeedLogin){
 		Document doc=null;
         DoubanConnect doubanConnect=null;
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(4000);
             doubanConnect= DoubanConnectPool.getInstance().getConnection();
+            if(!doubanConnect.isLogin && isNeedLogin){
+				doubanConnect.isLogin=true;
+			}
 			Connection conn=doubanConnect.getConnection();
 			conn.url(oneListUrl);
 			Response rse=null;
@@ -84,15 +84,15 @@ public class SpiderTool {
 			if (doc == null && tryTime >= 0) {
 				System.out.println("解析product：" + oneListUrl + "的 DOC 时出错！剩余尝试次数："
 						+ tryTime);
-				return Getdoc(oneListUrl, tryTime--);
+				return Getdoc(oneListUrl, tryTime--,isNeedLogin);
 			} else if (isLogin(doc)) {
 				doubanConnect.setStatus(false);
 				System.out.println("掉线重连...");
-				return Getdoc(oneListUrl, tryTime--);
+				return Getdoc(oneListUrl, tryTime--,isNeedLogin);
 			}
 		} catch (Exception e) {
 		    try {
-                doc=Jsoup.connect(oneListUrl).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31").timeout(10000).get();
+                doc=Jsoup.connect(oneListUrl).userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12.4; U; fr) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31").timeout(10000).get();
             }catch (Exception ex){
                 log.error(ex.getMessage());
             }
@@ -111,6 +111,8 @@ public class SpiderTool {
 	}
 
 	public static String removeZh(String str){
+		if(str==null || str.trim()=="")
+			return str;
 		String reg="[\u4e00-\u9fa5]";
 		Pattern pattern = Pattern.compile(reg);
 		return pattern.matcher(str).replaceAll("");

@@ -40,43 +40,16 @@ public class DoubanBookTask implements Runnable {
 		InitailTask.initailDoubanbookSchedule();
 	}
 	public static void spiderTask(){
-		Queue<String> temp;
-		synchronized (bookSchedule){
-			temp=bookSchedule;
+		String[] detailurls=null;
+		synchronized (DoubanBookTask.bookSchedule){
+			detailurls=new String[bookSchedule.size()];
+			for (int i=0;i<bookSchedule.size();i++) {
+				detailurls[i]=bookSchedule.poll();
+			}
 			bookSchedule.clear();
 		}
-		Object[] bookurls=temp.toArray();
-		int threadnum=3;
-		int left=bookurls.length;
-		int booksnumInTheard=(int)Math.ceil((double)left/(double) threadnum);
-		List<Thread> threads=new ArrayList<>(threadnum);
-	    for (int i=0;i<bookurls.length;i+=booksnumInTheard-1){
-	    	if(left<=0)
-	    		break;
-			if(left<booksnumInTheard)
-				booksnumInTheard=left;
-	    	String[] detailurls=new String[booksnumInTheard];
-	    	for(int j=0;j<booksnumInTheard;j++){
-				detailurls[j]=bookurls[i].toString();
-			}
-			DoubanBookDetail Detial=new DoubanBookDetail(detailurls);
-			try {
-				Detial.run();
-//				Thread detailThread=new Thread(Detial);
-//				detailThread.start();
-//				threads.add(detailThread);
-			} catch (Exception e) {
-				log.error(e.toString());
-			}
-			left-=booksnumInTheard;
-		}
-		for (Thread tr:threads) {
-			try {
-				tr.join();
-			} catch (InterruptedException e) {
-				log.error(e.getMessage());
-			}
-		}
+		DoubanBookDetail Detial=new DoubanBookDetail(detailurls);
+		Detial.run();
 		System.out.println(Thread.currentThread().getName() + "当前任务结束");
 	}
 }

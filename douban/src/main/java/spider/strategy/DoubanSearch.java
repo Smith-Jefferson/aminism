@@ -62,13 +62,23 @@ public class DoubanSearch implements Runnable{
     @Override
     public void run() {
         String url=base+searchType+"/"+searchName;
-        Document doc= SpiderTool.Getdoc(url,3);
+        try {
+            Thread.sleep(2000);
+        }catch (Exception e){}
+
+        Document doc= SpiderTool.Getdoc(url,3,false);
         Elements books=doc.select("a[href]");
         DoubanBookIndex.addToSchedule(books);
-        for(int i=2;i<getMaxNum(doc);i++){
+        int maxstep=getMaxNum(doc);
+        maxstep=maxstep>3?3:maxstep;
+        for(int i=2;i<maxstep;i++){
+            try {
+                Thread.sleep(2000);
+            }catch (Exception e){}
+
             url=getNextPage(base,i);
             if(url!=null){
-                DoubanBookIndex.addToSchedule(SpiderTool.Getdoc(url,3).select("a[href]"));
+                DoubanBookIndex.addToSchedule(SpiderTool.Getdoc(url,3,false).select("a[href]"));
             }else
                 break;
         }

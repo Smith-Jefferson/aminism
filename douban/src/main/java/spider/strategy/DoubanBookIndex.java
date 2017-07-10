@@ -15,7 +15,7 @@ import spider.tool.SpiderTool;
 public class DoubanBookIndex {
     private static final Logger log = LoggerFactory.getLogger(DoubanBookIndex.class);
     public static void getBookUrl(){
-        Document doc= SpiderTool.Getdoc("https://book.douban.com/",3);
+        Document doc= SpiderTool.Getdoc("https://book.douban.com/",3,false);
         if(doc==null){
             SpiderTool tool=new SpiderTool();
             doc=tool.GetdocByExplore("https://book.douban.com/");
@@ -25,12 +25,17 @@ public class DoubanBookIndex {
         addToSchedule(books);
         //通过tag搜索获得
         Elements tags=doc.select("div.aside ul.hot-tags-col5").select("a[href]");
-
+        int count=5;
         for (Element tag:tags){
             String[] attr=tag.attr("href").split("/");
             try {
                 DoubanSearch doubanSearch=new DoubanSearch("https://book.douban.com/",attr[2],attr[1]);
-                new Thread(doubanSearch).start();
+
+                if(--count>0)
+                    App.fixedThreadPool.execute(doubanSearch);
+                else
+                    doubanSearch.run();
+                //new Thread(doubanSearch).start();
             }catch (Exception e){
                 log.info(e.getMessage());
             }
