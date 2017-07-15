@@ -4,6 +4,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /** 
 * DoubanBookDetail Tester. 
 * 
@@ -12,7 +15,7 @@ import org.junit.Test;
 * @version 1.0 
 */ 
 public class DoubanBookDetailTest {
-    private static String url="https://book.douban.com/subject/27046739";
+    private static String url="https://book.douban.com/subject/5337243";
     @Before
     public void before() throws Exception {
     }
@@ -23,7 +26,8 @@ public class DoubanBookDetailTest {
     }
     @Test
     public void taskTest(){
-        String[] books={url};
+        Set<String> books=new HashSet<>();
+        books.add(url);
         DoubanBookDetail bookDetail=new DoubanBookDetail(books);
         bookDetail.run();
     }

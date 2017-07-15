@@ -56,7 +56,7 @@ public class LogEntity {
     }
 
     @Basic
-    @Column(name = "insertime")
+    @Column(name = "insertime", updatable = false,columnDefinition = "timestamp default current_timestamp")
     public Timestamp getInsertime() {
         return insertime;
     }

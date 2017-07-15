@@ -20,6 +20,7 @@ import spider.tool.SpiderTool;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -27,9 +28,9 @@ import java.util.concurrent.CountDownLatch;
  */
 public class DoubanBookDetail implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(DoubanBookDetail.class);
-    private String[] books;
+    private Set<String> books;
     private DoubanbookEntity  doubanbook;
-    public DoubanBookDetail(String[] books) {
+    public DoubanBookDetail(Set<String> books) {
         this.books = books;
     }
 
@@ -73,7 +74,7 @@ public class DoubanBookDetail implements Runnable {
         Session session= SessionPool.getSession();
         try {
             Transaction transaction=session.beginTransaction();
-            if(App.getBloomFilter().ContainedThenAdd(doubanbook.getBookid()+"")){
+            if(App.getBloomFilter().ContainedThenAdd(doubanbook.getBookid())){
                 session.update(doubanbook);
             }else{
                 session.save(doubanbook);
@@ -86,6 +87,9 @@ public class DoubanBookDetail implements Runnable {
             SessionPool.freeSession(session);
         }
         log.info("获取该书的短评");
+        if(url.endsWith("/")){
+            url=url.substring(0,url.length()-1);
+        }
         DoubanBookComment comment=new DoubanBookComment(url+"/comments/");
         try {
             App.fixedThreadPool.execute(comment);
@@ -120,7 +124,7 @@ public class DoubanBookDetail implements Runnable {
         SessionPool.freeSession(session);
     }
 
-    public void setBooks(String[] books) {
+    public void setBooks(Set<String> books) {
         this.books = books;
     }
 
@@ -134,13 +138,26 @@ public class DoubanBookDetail implements Runnable {
     }
 
     public void setAuthor(Document doc) {
-        String author=doc.select("div.indent").select("div#info").select("a[href]").get(0).text();
+        String author=null;
+        try {
+            author=doc.select("div.indent").select("div#info").select("a[href]").get(0).text();
+        }catch (Exception e){
+            log.error(e.getLocalizedMessage());
+        }
         doubanbook.setAuthor(author);
     }
 
     public void setPublisher(Document doc) {
-        String publisher = doc.select("div.indent").select("div#info").select("span").get(2).nextSibling().outerHtml();
+        String publisher =null;
+        Elements els=doc.select("div.indent").select("div#info").select("span");
+        for (Element el:els){
+            if(el.text().equals("出版社:")){
+                publisher = el.nextSibling().outerHtml();
+                break;
+            }
+        }
         doubanbook.setPublisher(publisher);
+
     }
 
     public void setPublishdate(Document doc) {
@@ -159,7 +176,7 @@ public class DoubanBookDetail implements Runnable {
         for (Element el:els){
             if("页数:".equals(el.text())) {
                 String pageno = el.nextSibling().outerHtml().trim();
-                doubanbook.setPageno(Integer.valueOf(pageno));
+                doubanbook.setPageno(Integer.valueOf(SpiderTool.OnlyNo(pageno)));
                 break;
             }
         }
@@ -180,9 +197,12 @@ public class DoubanBookDetail implements Runnable {
         Elements els=doc.select("div#info").select("span");
         for (Element el:els){
             if("定价:".equals(el.text())) {
-                String price = el.nextSibling().outerHtml().replace("元","").replace("CNY","").replace("RMB","").trim();
-                doubanbook.setPrice(Double.valueOf(price));
-                break;
+                String price = SpiderTool.OnlyNo(el.nextSibling().outerHtml().replace("元","").replace("CNY","").replace("RMB","")).trim();
+                if (price!=""){
+                    doubanbook.setPrice(Double.valueOf(price));
+                    break;
+                }
+
             }
         }
     }
@@ -192,7 +212,7 @@ public class DoubanBookDetail implements Runnable {
         for (Element el:els){
             if("ISBN:".equals(el.text())) {
                 String isbn = el.nextSibling().outerHtml().trim();
-                doubanbook.setIsbn(Long.valueOf(isbn));
+                doubanbook.setIsbn(Long.valueOf(SpiderTool.OnlyNo(isbn)));
                 break;
             }
         }
@@ -206,7 +226,13 @@ public class DoubanBookDetail implements Runnable {
     }
 
     public void setAuthorintro(Document doc) {
-        String authorintro = doc.select("div.related_info").select("div.indent").select("div.intro").last().text();
+        String authorintro = null;
+        try{
+            authorintro=doc.select("div.related_info").select("div.indent").select("div.intro").last().text();
+        }catch (Exception e){
+            LogManager.writeLog("没有找到作者简介"+e.getMessage(),LogLevel.WARM);
+        }
+
         doubanbook.setAuthorintro(authorintro);
     }
 

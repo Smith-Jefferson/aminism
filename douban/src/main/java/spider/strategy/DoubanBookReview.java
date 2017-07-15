@@ -54,7 +54,7 @@ public class DoubanBookReview implements Runnable {
             log.error(e.getMessage(),e);
         }
         Document doc= SpiderTool.Getdoc(url,3,false);
-        int counts=Integer.parseInt(SpiderTool.removeZh(doc.select("div#content").select("h1").text().replace("(","").replace(")","")).replace(",","").trim());
+        int counts=Integer.parseInt(SpiderTool.OnlyNo(SpiderTool.removeZh(doc.select("div#content").select("h1").text().replace("(","").replace(")","")).replace(",","").trim()));
         if(counts<=0)
             return;
         if(reviewsUrl==null)

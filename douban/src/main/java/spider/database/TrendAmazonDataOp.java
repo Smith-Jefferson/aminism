@@ -129,7 +129,7 @@ public class TrendAmazonDataOp  implements SaveData{
 		Connection conn=null;
 		PreparedStatement pstmt = null;
 		BloomFilter bloomFilter=new BloomFilter();
-		if(!bloomFilter.ifNotContainsSet(product1.getAsin())){
+		if(!bloomFilter.contains(product1.getAsin())){
 			String query="INSERT INTO "
 					+ table
 					+ "(Iname,Iurl,Iimg_url,Iprice,asin,sellers,Icategory,rank)"
@@ -233,7 +233,7 @@ public class TrendAmazonDataOp  implements SaveData{
 		try{
 			conn= DatabaseConnectPool.getInstance().getConnection();
 			BloomFilter bloomFilter=new BloomFilter();
-			if(!bloomFilter.ifNotContainsSet(asinTime)){
+			if(!bloomFilter.contains(asinTime)){
 				pstmt = conn.prepareStatement(query);
 				status=pstmt.executeUpdate();
 				if(status==1){

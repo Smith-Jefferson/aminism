@@ -84,7 +84,7 @@ public class DoubanBookComment implements Runnable{
             str.delete(0,str.length());
         }
         log.info("记录短评条数："+count);
-        pageCount=Integer.parseInt(SpiderTool.removeZh(doc.select("span#total-comments").text()).trim());
+        pageCount=Integer.parseInt(SpiderTool.OnlyNo(SpiderTool.removeZh(doc.select("span#total-comments").text()).trim()));
         if(currentPage++<(int)Math.ceil((double)pageCount/(double) 20)){
             try {
                 Thread.sleep(4000);

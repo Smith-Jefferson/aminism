@@ -20,9 +20,7 @@ import java.util.List;
 public class InitailTask {
     public static void initailDoubanBook(){
         List<Long> bookIDs= DoubanDataRep.getDoubanBook();
-        for(long bookID:bookIDs){
-            App.getBloomFilter().add(bookID+"");
-        }
+        App.getBloomFilter().addAll(bookIDs);
     }
     public static void initailDoubanBookComment(){
         List<DoubanbookCommentEntity> books=DoubanDataRep.getDoubanbookComment();

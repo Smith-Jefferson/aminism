@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
 import spider.tool.SpiderTool;
-
+import static org.junit.Assert.*;
 /** 
 * SpiderTool Tester. 
 * 
@@ -42,7 +42,23 @@ public void testGetdoc() throws Exception {
 @Test
 public void testIsLogin() throws Exception { 
 //TODO: Test goes here... 
-} 
+}
+
+@Test
+public void testOnlyNo(){
+    String s="() 3.9";
+    s=SpiderTool.OnlyNo(s);
+    assertTrue("3.9".equals(s));
+}
+
+@Test
+public void testSubUrl(){
+    String url="https://book.douban.com/subject/3920144/";
+    if(url.endsWith("/")){
+        url=url.substring(0,url.length()-1);
+    }
+    System.out.print(url);
+}
 
 
 } 

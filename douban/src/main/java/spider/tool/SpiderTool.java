@@ -63,11 +63,11 @@ public class SpiderTool {
 		agent[up.getAndIncrement()][1]=port;
 	}
 
-	public static Document Getdoc(String oneListUrl, int tryTime,boolean isNeedLogin){
+	public static synchronized Document Getdoc(String oneListUrl, int tryTime,boolean isNeedLogin){
 		Document doc=null;
         DoubanConnect doubanConnect=null;
 		try {
-			Thread.sleep(4000);
+			Thread.sleep(40000);
             doubanConnect= DoubanConnectPool.getInstance().getConnection();
             if(!doubanConnect.isLogin && isNeedLogin){
 				doubanConnect.isLogin=true;
@@ -76,6 +76,7 @@ public class SpiderTool {
 			conn.url(oneListUrl);
 			Response rse=null;
 			try{
+				Thread.sleep(40000);
                 rse=conn.ignoreContentType(true).method(Method.GET).execute();//获取响应
             }catch (Exception ex){
                 rse=conn.ignoreContentType(true).method(Method.POST).execute();//获取响应
@@ -92,6 +93,7 @@ public class SpiderTool {
 			}
 		} catch (Exception e) {
 		    try {
+				Thread.sleep(40000);
                 doc=Jsoup.connect(oneListUrl).userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12.4; U; fr) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31").timeout(10000).get();
             }catch (Exception ex){
                 log.error(ex.getMessage());
@@ -116,6 +118,16 @@ public class SpiderTool {
 		String reg="[\u4e00-\u9fa5]";
 		Pattern pattern = Pattern.compile(reg);
 		return pattern.matcher(str).replaceAll("");
+	}
+
+	public static String OnlyNo(String str){
+		StringBuffer str2=new StringBuffer(str.length());
+		for(int i=0;i<str.length();i++) {
+			if ((str.charAt(i) >= 48 && str.charAt(i) <= 57)||str.charAt(i)==46 ) {
+				str2.append(str.charAt(i));
+			}
+		}
+		return str2.toString();
 	}
 
 	public static boolean isNo(String str){
