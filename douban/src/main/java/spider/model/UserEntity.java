@@ -1,5 +1,6 @@
 package spider.model;
 
+import net.sf.cglib.beans.BeanCopier;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.Generated;
@@ -9,9 +10,12 @@ import spider.database.DoubanDataRep;
 import spider.pool.SessionPool;
 
 import javax.persistence.*;
+import java.lang.reflect.Array;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by hello world on 2017/1/10.

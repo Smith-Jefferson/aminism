@@ -7,11 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="douban" />
+        <module name="UI" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="aminism" target="1.8" />
       <module name="douban" target="1.8" />
+      <module name="UI" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

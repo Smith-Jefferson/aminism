@@ -6,6 +6,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>douban</module>
+        <module>UI</module>
     </modules>
     <groupId>spider</groupId>
     <artifactId>aminism</artifactId>
