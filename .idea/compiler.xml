@@ -10,8 +10,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="aminism" target="1.8" />
-      <module name="douban" target="1.8" />
+      <module name="aminism" target="1.5" />
+      <module name="douban" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
