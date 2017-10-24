@@ -178,7 +178,7 @@ public static String getIurl(Document ele) {
 		Elements eles=ele.select("tbody").select("td");
 		String tems=eles.eq(3).text();
 		try{
-			return Integer.parseInt(tems);
+			return Integer.parseInt(SpiderTool.OnlyNo(tems));
 			
 		}catch(Exception e){
 			return 0;

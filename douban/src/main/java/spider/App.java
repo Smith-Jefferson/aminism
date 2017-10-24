@@ -17,23 +17,27 @@ public class App
     private static final Logger log = LoggerFactory.getLogger(App.class);
     private volatile static BloomFilter bloomFilter=new BloomFilter();
     public static ExecutorService fixedThreadPool;
+    public static ExecutorService mainTaskThreadPool;
     static {
-        fixedThreadPool= Executors.newFixedThreadPool(50);
+        fixedThreadPool= Executors.newFixedThreadPool(5);
+        mainTaskThreadPool= Executors.newFixedThreadPool(30);
     }
-    public static void main( String[] args )
+    public static void main( String[] args ) throws Exception
     {
         log.info("程序开始获取数据...");
         DoubanBookTask doubanBookTask=new DoubanBookTask();
         doubanBookTask.run();
-//        Thread thread=new Thread(doubanBookTask);
-//        thread.start();
-//        try {
-//            thread.join();
-//        } catch (InterruptedException e) {
-//            log.error(e.getMessage());
-//        }
-        log.info("豆瓣读书...");
-        log.info("程序结束.");
+        fixedThreadPool.shutdown();
+        mainTaskThreadPool.shutdown();
+        while (true){
+            if(fixedThreadPool.isTerminated() && mainTaskThreadPool.isTerminated()){
+                log.info("豆瓣读书...");
+                log.info("程序结束.");
+                break;
+            }
+            Thread.sleep(20000);
+        }
+
     }
 
     public static BloomFilter getBloomFilter() {

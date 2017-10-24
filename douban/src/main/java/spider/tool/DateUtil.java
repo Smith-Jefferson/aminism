@@ -51,11 +51,18 @@ public class DateUtil {
      * @return Date
      */
     public static Date parseDate(String date, String pattern) {
+        date=date.replace(".","-");
         try {
             return new SimpleDateFormat(pattern).parse(date);
-        } catch (ParseException e) {
-            throw new IllegalArgumentException("don't format type");
+        } catch (Exception e) {
+            try {
+                return new SimpleDateFormat("YYYY").parse(date);
+            }
+            catch (Exception ex){
+                ex.printStackTrace();
+            }
         }
+        return null;
     }
 
     /**
@@ -139,8 +146,15 @@ public class DateUtil {
         dateFormat = new SimpleDateFormat(formaterString);// 设定格式
         // dateFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         dateFormat.setLenient(false);
-        java.util.Date timeDate = dateFormat.parse(dateString);// util类型
-        java.sql.Timestamp dateTime = new java.sql.Timestamp(timeDate.getTime());// Timestamp类型,timeDate.getTime()返回一个long型
+        java.sql.Timestamp dateTime =null;
+        try {
+            java.util.Date timeDate = dateFormat.parse(dateString);// util类型
+            dateTime = new java.sql.Timestamp(timeDate.getTime());// Timestamp类型,timeDate.getTime()返回一个long型
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         return dateTime;
     }
 

@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 
 import spider.App;
 import spider.database.SaveTrendsAmazon;
@@ -19,11 +20,21 @@ import org.slf4j.LoggerFactory;
 
 public class DoubanBookTask implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(DoubanBookTask.class);
-	public static volatile Queue<String> bookSchedule=new ConcurrentLinkedDeque<>();
+	public static volatile Queue<String> bookSchedule=new ConcurrentLinkedDeque<String>();
 	public void run(){
 		initail();
-		while (!bookSchedule.isEmpty())
-			spiderTask();
+		while (true){
+			if(bookSchedule.isEmpty())
+				break;
+			try {
+				spiderTask();
+				Thread.sleep(200000);
+			}catch (Exception e){
+				log.error(e.getLocalizedMessage());
+			}
+
+		}
+
 	}
 
 	public void initail(){
@@ -40,16 +51,28 @@ public class DoubanBookTask implements Runnable {
 		InitailTask.initailDoubanbookSchedule();
 	}
 	public static void spiderTask(){
-		String[] detailurls=null;
+		Set<String> detailurls=null;
 		synchronized (DoubanBookTask.bookSchedule){
-			detailurls=new String[bookSchedule.size()];
+			detailurls=new HashSet<String>(bookSchedule.size());
 			for (int i=0;i<bookSchedule.size();i++) {
-				detailurls[i]=bookSchedule.poll();
+				detailurls.add(bookSchedule.poll());
 			}
 			bookSchedule.clear();
 		}
-		DoubanBookDetail Detial=new DoubanBookDetail(detailurls);
-		Detial.run();
+		int taskNum=5;
+		Set taskSet=new HashSet(5);
+		for (String url:detailurls) {
+			if(taskNum-->0){
+				taskSet.add(url);
+			}else{
+				DoubanBookDetail Detial=new DoubanBookDetail(taskSet);
+				App.mainTaskThreadPool.execute(Detial);
+				taskNum=5;
+				taskSet=new HashSet(5);
+			}
+
+		}
+		//Detial.run();
 		System.out.println(Thread.currentThread().getName() + "当前任务结束");
 	}
 }

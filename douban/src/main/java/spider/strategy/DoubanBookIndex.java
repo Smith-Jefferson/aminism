@@ -16,25 +16,26 @@ public class DoubanBookIndex {
     private static final Logger log = LoggerFactory.getLogger(DoubanBookIndex.class);
     public static void getBookUrl(){
         Document doc= SpiderTool.Getdoc("https://book.douban.com/",3,false);
-        if(doc==null){
-            SpiderTool tool=new SpiderTool();
-            doc=tool.GetdocByExplore("https://book.douban.com/");
-        }
+        //if(doc==null){
+          //  SpiderTool tool=new SpiderTool();
+            //doc=tool.GetdocByExplore("https://book.douban.com/");
+        //}
         //首页直接获取书籍地址
         Elements books=doc.select("a[href]");
         addToSchedule(books);
         //通过tag搜索获得
         Elements tags=doc.select("div.aside ul.hot-tags-col5").select("a[href]");
-        int count=5;
+        int count=3;
         for (Element tag:tags){
             String[] attr=tag.attr("href").split("/");
             try {
                 DoubanSearch doubanSearch=new DoubanSearch("https://book.douban.com/",attr[2],attr[1]);
 
-                if(--count>0)
-                    App.fixedThreadPool.execute(doubanSearch);
-                else
+                if(count-->0)
                     doubanSearch.run();
+                else
+                    App.fixedThreadPool.execute(doubanSearch);
+
                 //new Thread(doubanSearch).start();
             }catch (Exception e){
                 log.info(e.getMessage());
@@ -55,8 +56,9 @@ public class DoubanBookIndex {
     public static void addToSchedule(String url){
         if(isBookUrl(url)){
             try {
-                url="https://book.douban.com/subject/"+url.split("subject/")[1].split("/")[0];
-                if(!App.getBloomFilter().contains(url)){
+                String bookid=url.split("subject/")[1].split("/")[0];
+                url="https://book.douban.com/subject/"+bookid;
+                if(!App.getBloomFilter().contains(bookid)){
                     synchronized (DoubanBookTask.bookSchedule){
                         DoubanBookTask.bookSchedule.add(url);
                     }

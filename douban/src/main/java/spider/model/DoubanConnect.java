@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by hello world on 2017/1/10.
  */
-public class DoubanConnect {
+public class DoubanConnect extends CloneableBase{
     private static final Logger log = LoggerFactory.getLogger(DoubanBookTask.class);
     private volatile static Map cookies;
     private volatile boolean status=true;
@@ -48,7 +48,7 @@ public class DoubanConnect {
         Map<String,String> proxy= SpiderTool.getAgent();
         System.getProperties().setProperty("http.proxyHost", proxy.get("host")!=null?proxy.get("host"): InetAddress.getLocalHost().getHostAddress());
         System.getProperties().setProperty("http.proxyPort", proxy.get("port")!=null?proxy.get("port"):"80");
-        this.con= Jsoup.connect("https://www.douban.com/accounts/login");
+        this.con= Jsoup.connect("https://www.douban.com");
         this.con.header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12.4; U; fr) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31");
         this.con.timeout(300 * 1000);
     }

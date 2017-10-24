@@ -94,7 +94,7 @@ public class DoubanbookOffer implements Runnable{
             for (Element p:pages) {
                 String temp=p.select("a[href]").text();
                 if(SpiderTool.isNo(temp)){
-                    int tmp=Integer.parseInt(temp);
+                    int tmp=Integer.parseInt(SpiderTool.OnlyNo(temp));
                     if(max<tmp)
                         max=tmp;
                 }
