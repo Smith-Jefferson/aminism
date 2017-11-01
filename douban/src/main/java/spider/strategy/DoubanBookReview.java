@@ -1,19 +1,19 @@
 package spider.strategy;
 
 import com.google.common.base.Joiner;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import spider.App;
+import spider.database.DoubanDataRep;
 import spider.model.DoubanbookReviewEntity;
 import spider.model.LogLevel;
 import spider.model.UserEntity;
-import spider.pool.SessionPool;
 import spider.service.LogManager;
+import spider.tool.CLogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -26,6 +26,8 @@ import java.util.List;
  * Created by hello world on 2017/1/16.
  */
 public class DoubanBookReview implements Runnable {
+    @Autowired
+    private DoubanDataRep doubanDataRep;
     private static final Logger log = LoggerFactory.getLogger(DoubanBookReview.class);
     private int start=0;
     private String baseurl;
@@ -51,7 +53,7 @@ public class DoubanBookReview implements Runnable {
         try {
             Thread.sleep(4000);
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            CLogManager.error(e);
         }
         Document doc= SpiderTool.Getdoc(url,3,false);
         int counts=Integer.parseInt(SpiderTool.OnlyNo(SpiderTool.removeZh(doc.select("div#content").select("h1").text().replace("(","").replace(")","")).replace(",","").trim()));
@@ -64,7 +66,6 @@ public class DoubanBookReview implements Runnable {
             reviewsUrl.add(el.select(".title").select("a[href]").attr("abs:href"));
         }
 
-        Session session;
         UserEntity user;
         StringBuilder str=new StringBuilder();
         for (String reviewUrl:reviewsUrl) {
@@ -78,9 +79,7 @@ public class DoubanBookReview implements Runnable {
                 user.setUname(getUserName(review));
                 user.setAvatar(getUserAvatar(review));
                 user.setFlag(0);
-                long userid=user.getUserID(user);
-
-                session= SessionPool.getSession();
+                long userid=doubanDataRep.getUserID(user);
                 bookreview.setUserid(userid);
                 bookreview.setDoubanuserid(user.getDoubanuserid());
                 bookreview.setUrl(reviewUrl);
@@ -93,27 +92,21 @@ public class DoubanBookReview implements Runnable {
                 bookreview.setReviewRecusers(getReviewRecusers(reviewUrl));
                 bookreview.setReviewLikeuser(getReviewLikeuser(reviewUrl));
                 if(!App.getBloomFilter().ContainedThenAdd(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString())){
-                    session.save(bookreview);
+                    doubanDataRep.saveReview(bookreview);
                 }
                 try{
-                    Transaction transaction=session.beginTransaction();
-                    transaction.commit();
                     DoubanBookReviewComment reviewComment=new DoubanBookReviewComment(review);
                     reviewComment.setBookid(bookid);
                     reviewComment.setBaseUrl(reviewUrl);
                     App.fixedThreadPool.execute(reviewComment);
                     //reviewComment.run();
                 }catch(Exception e){
-                    log.error(e.getStackTrace().toString());
-                    LogManager.writeLog(e);
-                }finally {
-                    SessionPool.freeSession(session);
+                    CLogManager.error(e);
                 }
 
             }
             catch (Exception e){
-                log.error(e.getStackTrace().toString());
-                LogManager.writeLog(e, LogLevel.FATAL,reviewUrl);
+                CLogManager.error(e);
             }
         }
         if(start<counts)
@@ -188,12 +181,11 @@ public class DoubanBookReview implements Runnable {
                 String avatar=el.select("div.pic").select("img").attr("src");
                 user.setAvatar(avatar);
                 user.setFlag(0);
-                userids[recN++]=user.getUserID(user);
+                userids[recN++]=doubanDataRep.getUserID(user);
             }
             reviewRecusers=Joiner.on(",").join(userids).toString();
         }catch (Exception e){
-            log.error(e.getStackTrace().toString());
-            LogManager.writeLog(e, LogLevel.FATAL,url);
+            CLogManager.error(e);
         }
         return reviewRecusers;
     }
@@ -216,12 +208,11 @@ public class DoubanBookReview implements Runnable {
                 String avatar=el.select("div.pic").select("img").attr("src");
                 user.setAvatar(avatar);
                 user.setFlag(0);
-                userids[recN++]=user.getUserID(user);
+                userids[recN++]=doubanDataRep.getUserID(user);
             }
             reviewLikeuser=Joiner.on(",").join(userids).toString();
         }catch (Exception e){
-            log.error(e.getStackTrace().toString());
-            LogManager.writeLog(e, LogLevel.FATAL,url);
+            CLogManager.error(e);
         }
         return reviewLikeuser;
     }
@@ -232,8 +223,7 @@ public class DoubanBookReview implements Runnable {
         try {
             time = DateUtil.string2Time(date,"yyyy-MM-dd HH:mm:ss");
         } catch (ParseException e) {
-            log.error(e.getStackTrace().toString());
-            LogManager.writeLog(e, LogLevel.FATAL,url);
+            CLogManager.error(e);
         }
         return time;
     }

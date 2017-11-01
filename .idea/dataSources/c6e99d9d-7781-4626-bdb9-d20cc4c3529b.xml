@@ -10,5 +10,665 @@
     <schema id="4" parent="1" name="mysql"/>
     <schema id="5" parent="1" name="performance_schema"/>
     <schema id="6" parent="1" name="test"/>
+    <table id="7" parent="2" name="doubanactivity"/>
+    <table id="8" parent="2" name="doubanbook"/>
+    <table id="9" parent="2" name="doubanbook_comment"/>
+    <table id="10" parent="2" name="doubanbook_offer"/>
+    <table id="11" parent="2" name="doubanbook_review"/>
+    <table id="12" parent="2" name="doubanbook_review_comment"/>
+    <table id="13" parent="2" name="doubangroup"/>
+    <table id="14" parent="2" name="doubanmovie"/>
+    <table id="15" parent="2" name="doubanmusic"/>
+    <table id="16" parent="2" name="doubanrate"/>
+    <table id="17" parent="2" name="log"/>
+    <table id="18" parent="2" name="taskurl"/>
+    <table id="19" parent="2" name="user"/>
+    <column id="20" parent="7" name="activityid">
+      <Position>1</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="21" parent="7" name="name">
+      <Position>2</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="22" parent="7" name="url">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="23" parent="7" name="inserttime">
+      <Position>4</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="24" parent="7" name="updatetime">
+      <Position>5</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="25" parent="7" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>activityid</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="26" parent="8" name="bookid">
+      <Position>1</Position>
+      <Comment>doubanbookid</Comment>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="27" parent="8" name="bookname">
+      <Position>2</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="28" parent="8" name="author">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="29" parent="8" name="publisher">
+      <Position>4</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="30" parent="8" name="publishdate">
+      <Position>5</Position>
+      <DataType>date|0</DataType>
+    </column>
+    <column id="31" parent="8" name="pageno">
+      <Position>6</Position>
+      <Comment>装帧</Comment>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <column id="32" parent="8" name="binding">
+      <Position>7</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="33" parent="8" name="price">
+      <Position>8</Position>
+      <DataType>decimal(10,2)|0</DataType>
+    </column>
+    <column id="34" parent="8" name="ISBN">
+      <Position>9</Position>
+      <DataType>bigint(20)|0</DataType>
+    </column>
+    <column id="35" parent="8" name="bookintro">
+      <Position>10</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="36" parent="8" name="faceimg">
+      <Position>11</Position>
+      <Comment>封面图像</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="37" parent="8" name="authorintro">
+      <Position>12</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="38" parent="8" name="menu">
+      <Position>13</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="39" parent="8" name="sample">
+      <Position>14</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="40" parent="8" name="tagids">
+      <Position>15</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="41" parent="8" name="douban_IBCF">
+      <Position>16</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="42" parent="8" name="douban_UBCF">
+      <Position>17</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="43" parent="8" name="rate">
+      <Position>18</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="44" parent="8" name="url">
+      <Position>19</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="45" parent="8" name="extention">
+      <Position>20</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="46" parent="8" name="inserttime">
+      <Position>21</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="47" parent="8" name="updatetime">
+      <Position>22</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="48" parent="8" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>bookid</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="49" parent="9" name="id">
+      <Position>1</Position>
+      <DataType>bigint(20) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="50" parent="9" name="userid">
+      <Position>2</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="51" parent="9" name="doubanuserid">
+      <Position>3</Position>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="52" parent="9" name="bookid">
+      <Position>4</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="53" parent="9" name="rate">
+      <Position>5</Position>
+      <DataType>smallint(5)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="54" parent="9" name="comment">
+      <Position>6</Position>
+      <DataType>mediumtext|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="55" parent="9" name="follownum">
+      <Position>7</Position>
+      <DataType>int(11)|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="56" parent="9" name="ratedate">
+      <Position>8</Position>
+      <DataType>date|0</DataType>
+    </column>
+    <column id="57" parent="9" name="inserttime">
+      <Position>9</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="58" parent="9" name="updatetime">
+      <Position>10</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="59" parent="9" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="60" parent="10" name="id">
+      <Position>1</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="61" parent="10" name="userid">
+      <Position>2</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="62" parent="10" name="bookid">
+      <Position>3</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="63" parent="10" name="state">
+      <Position>4</Position>
+      <Comment>状态，借，卖</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="64" parent="10" name="mark">
+      <Position>5</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="65" parent="10" name="offerdate">
+      <Position>6</Position>
+      <DataType>timestamp|0</DataType>
+    </column>
+    <column id="66" parent="10" name="city">
+      <Position>7</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="67" parent="10" name="price">
+      <Position>8</Position>
+      <DataType>decimal(10,2)|0</DataType>
+    </column>
+    <column id="68" parent="10" name="inserttime">
+      <Position>9</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="69" parent="10" name="updatetime">
+      <Position>10</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="70" parent="10" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="71" parent="11" name="id">
+      <Position>1</Position>
+      <DataType>bigint(20) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="72" parent="11" name="userid">
+      <Position>2</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="73" parent="11" name="doubanuserid">
+      <Position>3</Position>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="74" parent="11" name="bookid">
+      <Position>4</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="75" parent="11" name="rate">
+      <Position>5</Position>
+      <DataType>smallint(5)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="76" parent="11" name="review">
+      <Position>6</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="77" parent="11" name="follownum">
+      <Position>7</Position>
+      <DataType>int(11)|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="78" parent="11" name="disfollownum">
+      <Position>8</Position>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <column id="79" parent="11" name="review_recusers">
+      <Position>9</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="80" parent="11" name="review_likeuser">
+      <Position>10</Position>
+      <Comment>userids</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="81" parent="11" name="url">
+      <Position>11</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="82" parent="11" name="ratedate">
+      <Position>12</Position>
+      <DataType>datetime|0</DataType>
+    </column>
+    <column id="83" parent="11" name="inserttime">
+      <Position>13</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="84" parent="11" name="updatetime">
+      <Position>14</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="85" parent="11" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="86" parent="12" name="id">
+      <Position>1</Position>
+      <DataType>bigint(20) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="87" parent="12" name="userid">
+      <Position>2</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="88" parent="12" name="doubanuserid">
+      <Position>3</Position>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="89" parent="12" name="bookid">
+      <Position>4</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="90" parent="12" name="reviewid">
+      <Position>5</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="91" parent="12" name="comment">
+      <Position>6</Position>
+      <DataType>mediumtext|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="92" parent="12" name="replyid">
+      <Position>7</Position>
+      <DataType>mediumtext|0</DataType>
+    </column>
+    <column id="93" parent="12" name="ratedate">
+      <Position>8</Position>
+      <DataType>timestamp|0</DataType>
+    </column>
+    <column id="94" parent="12" name="inserttime">
+      <Position>9</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="95" parent="12" name="updatetime">
+      <Position>10</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="96" parent="12" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="97" parent="13" name="groupid">
+      <Position>1</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="98" parent="13" name="name">
+      <Position>2</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="99" parent="13" name="url">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="100" parent="13" name="inserttime">
+      <Position>4</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="101" parent="13" name="updatetime">
+      <Position>5</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="102" parent="13" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>groupid</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="103" parent="14" name="movieid">
+      <Position>1</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="104" parent="14" name="name">
+      <Position>2</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="105" parent="14" name="url">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="106" parent="14" name="inserttime">
+      <Position>4</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="107" parent="14" name="updatetime">
+      <Position>5</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="108" parent="14" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>movieid</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="109" parent="15" name="musicid">
+      <Position>1</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="110" parent="15" name="name">
+      <Position>2</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="111" parent="15" name="url">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="112" parent="15" name="inserttime">
+      <Position>4</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="113" parent="15" name="updatetime">
+      <Position>5</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="114" parent="15" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>musicid</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="115" parent="16" name="doubanbookid">
+      <Position>1</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="116" parent="16" name="userid">
+      <Position>2</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="117" parent="16" name="doubanuserid">
+      <Position>3</Position>
+      <DataType>bigint(20)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="118" parent="16" name="rate">
+      <Position>4</Position>
+      <DataType>smallint(5)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="119" parent="16" name="inserttime">
+      <Position>5</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="120" parent="16" name="updatetime">
+      <Position>6</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="121" parent="16" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>doubanbookid
+userid</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="122" parent="17" name="idLog">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="123" parent="17" name="message">
+      <Position>2</Position>
+      <DataType>varchar(2048)|0</DataType>
+    </column>
+    <column id="124" parent="17" name="level">
+      <Position>3</Position>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <column id="125" parent="17" name="tag">
+      <Position>4</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="126" parent="17" name="insertime">
+      <Position>5</Position>
+      <DataType>datetime|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <key id="127" parent="17" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>idLog</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="128" parent="18" name="url">
+      <Position>1</Position>
+      <DataType>varchar(200)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="129" parent="18" name="tag">
+      <Position>2</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="130" parent="18" name="source">
+      <Position>3</Position>
+      <DataType>varchar(45)|0</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;douban&apos;</DefaultExpression>
+    </column>
+    <key id="131" parent="18" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>url</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="132" parent="19" name="userid">
+      <Position>1</Position>
+      <DataType>bigint(20) unsigned|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="133" parent="19" name="doubanuserid">
+      <Position>2</Position>
+      <DataType>varchar(50)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="134" parent="19" name="uname">
+      <Position>3</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="135" parent="19" name="avatar">
+      <Position>4</Position>
+      <Comment>头像</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="136" parent="19" name="sentence">
+      <Position>5</Position>
+      <Comment>个性签名</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="137" parent="19" name="city">
+      <Position>6</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="138" parent="19" name="groups">
+      <Position>7</Position>
+      <Comment>豆瓣小组</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="139" parent="19" name="attentionTo">
+      <Position>8</Position>
+      <Comment>关注谁</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="140" parent="19" name="Toattention">
+      <Position>9</Position>
+      <Comment>被谁关注</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="141" parent="19" name="book_read">
+      <Position>10</Position>
+      <Comment>bookids读过</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="142" parent="19" name="book_plan">
+      <Position>11</Position>
+      <Comment>bookids想读</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="143" parent="19" name="music_listen">
+      <Position>12</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="144" parent="19" name="music_plan">
+      <Position>13</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="145" parent="19" name="movie_watch">
+      <Position>14</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="146" parent="19" name="movie_plan">
+      <Position>15</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="147" parent="19" name="activity_online">
+      <Position>16</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="148" parent="19" name="activity_offline">
+      <Position>17</Position>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="149" parent="19" name="resgistdate">
+      <Position>18</Position>
+      <DataType>date|0</DataType>
+    </column>
+    <column id="150" parent="19" name="flag">
+      <Position>19</Position>
+      <Comment>0:没有更新详细数据，1：更新书籍，2：更新音乐，3：更新电影，12,13,23,</Comment>
+      <DataType>int(11)|0</DataType>
+      <DefaultExpression>&apos;0&apos;</DefaultExpression>
+    </column>
+    <column id="151" parent="19" name="extention">
+      <Position>20</Position>
+      <DataType>text|0</DataType>
+    </column>
+    <column id="152" parent="19" name="inserttime">
+      <Position>21</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <column id="153" parent="19" name="updatetime">
+      <Position>22</Position>
+      <DataType>timestamp|0</DataType>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
+    </column>
+    <index id="154" parent="19" name="duid">
+      <ColNames>doubanuserid</ColNames>
+    </index>
+    <key id="155" parent="19" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>userid</ColNames>
+      <Primary>1</Primary>
+    </key>
   </database-model>
 </dataSource>

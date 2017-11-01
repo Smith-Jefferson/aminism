@@ -5,13 +5,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spider.tool.CLogManager;
 import spider.tool.SpiderTool;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
-
-import static spider.tool.SpiderTool.setAgent;
 
 /**
  * Created by hello world on 2017/1/12.
@@ -23,7 +22,7 @@ public class AgentFetcher implements Runnable{
     @Override
     public void run() {
         try {
-            setAgent(InetAddress.getLocalHost().getHostAddress().toString(),"80");
+            SpiderTool.setAgent(InetAddress.getLocalHost().getHostAddress().toString(),"80");
             //AgentFetcher.getKuaidailiAgent();
            // AgentFetcher.getXicidailiAgent();
         } catch (UnknownHostException e) {
@@ -31,7 +30,7 @@ public class AgentFetcher implements Runnable{
         }
     }
 
-    public static void getKuaidailiAgent(){
+    public void getKuaidailiAgent(){
         String[] agentUrl1s={"http://www.kuaidaili.com/free/inha/","http://www.kuaidaili.com/free/intr/","http://www.kuaidaili.com/free/outha/","http://www.kuaidaili.com/free/outtr/"};
         int maxnum=10;
         for (String agentUrl:agentUrl1s) {
@@ -52,7 +51,7 @@ public class AgentFetcher implements Runnable{
                         if(isIPAdress(host) && isNumeric(port)){
                             try{
                                 if((int)Float.parseFloat(time)<=1)
-                                    setAgent(host,port);
+                                    SpiderTool.setAgent(host,port);
                             }catch (Exception e){
                                 log.warn(e.getMessage());
                             }
@@ -62,13 +61,13 @@ public class AgentFetcher implements Runnable{
                         }
                     }
                 }catch (Exception e){
-                    log.error(e.getMessage());
+                    CLogManager.error(e);
                 }
             }
         }
     }
 
-    public static void getXicidailiAgent(){
+    public void getXicidailiAgent(){
         String[] agentUrl1s={"http://www.xicidaili.com/nn/","http://www.xicidaili.com/nt/","http://www.xicidaili.com/wn/","http://www.xicidaili.com/wt/"};
         int maxnum=10;
         for (String agentUrl:agentUrl1s) {
@@ -90,7 +89,7 @@ public class AgentFetcher implements Runnable{
                         if(isIPAdress(host) && isNumeric(port)){
                             try{
                                 if((int)Float.parseFloat(time)<=1)
-                                    setAgent(host,port);
+                                    SpiderTool.setAgent(host,port);
                             }catch (Exception e){
                                 log.warn(e.getMessage());
                             }
@@ -100,18 +99,18 @@ public class AgentFetcher implements Runnable{
                         }
                     }
                 }catch (Exception e){
-                    log.error(e.getMessage());
+                    CLogManager.error(e);
                 }
             }
         }
     }
 
-    public static void getHostPort(Elements tds){
+    public void getHostPort(Elements tds){
         String host=null;
         String port=null;
         for (Element td:tds){
             if(host!=null && port!=null){
-                setAgent(host,port);
+                SpiderTool.setAgent(host,port);
                 break;
             }
             String str=td.text();
@@ -126,16 +125,16 @@ public class AgentFetcher implements Runnable{
         }
     }
 
-    public static int getKuaidaiMaxnum(Document doc){
+    public int getKuaidaiMaxnum(Document doc){
         Elements pages=doc.select("div#listnav").select("a[href]");
         return getMaxNum(pages);
     }
-    public static int getXiciMaxnum(Document doc){
+    public int getXiciMaxnum(Document doc){
         Elements pages=doc.select("div.pagination").select("a[href]");
         return getMaxNum(pages);
     }
 
-    public static int getMaxNum(Elements pages){
+    public  int getMaxNum(Elements pages){
         for (int i = pages.size()-1; i >0 ; i--) {
             String str=pages.get(i).text();
             if(isNumeric(str))
@@ -144,12 +143,12 @@ public class AgentFetcher implements Runnable{
         return 0;
     }
 
-    public static boolean isIPAdress(String str){
+    public  boolean isIPAdress(String str){
         Pattern pattern=Pattern.compile("^((\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])\\.){3}(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|[*])$");
         return pattern.matcher(str).matches();
     }
 
-    public static boolean isNumeric(String str){
+    public boolean isNumeric(String str){
         Pattern pattern = Pattern.compile("[0-9]*");
         if(!pattern.matcher(str).matches())
             return false;

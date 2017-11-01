@@ -11,11 +11,12 @@ import spider.service.InitailTask;
 public class DoubanBookCommentTest {
     @Before
     public void before() throws Exception{
-        InitailTask.initailDoubanBook();
-        InitailTask.initailDoubanBookComment();
-        InitailTask.initailDoubanUser();
-        InitailTask.initialDoubanBookReview();
-        InitailTask.initialDoubanBookReviewComment();
+        InitailTask initailTask=new InitailTask();
+        initailTask.initailDoubanBook();
+        initailTask.initailDoubanBookComment();
+        initailTask.initailDoubanUser();
+        initailTask.initialDoubanBookReview();
+        initailTask.initialDoubanBookReviewComment();
     }
     @After
     public void after() throws Exception {

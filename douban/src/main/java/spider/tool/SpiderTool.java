@@ -1,42 +1,27 @@
 package spider.tool;
 
-import net.sourceforge.tess4j.ITesseract;
-import net.sourceforge.tess4j.Tesseract;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spider.model.DoubanConnect;
 import spider.pool.DoubanConnectPool;
 import spider.strategy.AgentFetcher;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class SpiderTool {
 	private static final Logger log = LoggerFactory.getLogger(SpiderTool.class);
 	private static volatile String[][] agent=new String[4][2];//代理服务器
 	private static AtomicInteger up=new AtomicInteger(0);
 	private static AtomicInteger down=new AtomicInteger(0);
-	private final static String datapath = System.getProperty("user.dir")+"/src/main/resources/";
 	public static void initailAgent() {
 		try {
 			AgentFetcher agentFetcher=new AgentFetcher();
@@ -44,7 +29,7 @@ public class SpiderTool {
            /* new Thread().start();
 			Thread.sleep(5000);*/
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			CLogManager.error(e);
 		}
 		log.info("当前获取代理ip条数："+Math.abs(up.get()-down.get()));
 	}
@@ -63,11 +48,18 @@ public class SpiderTool {
 		agent[up.getAndIncrement()][1]=port;
 	}
 
+	private static void sleep(){
+		try {
+			Thread.sleep(40000);
+		} catch (InterruptedException e) {
+			CLogManager.error("ThreadSleep",e);
+		}
+	}
+
 	public static synchronized Document Getdoc(String oneListUrl, int tryTime,boolean isNeedLogin){
 		Document doc=null;
         DoubanConnect doubanConnect=null;
 		try {
-			Thread.sleep(40000);
             doubanConnect= DoubanConnectPool.getInstance().getConnection();
             if(!doubanConnect.isLogin && isNeedLogin){
 				doubanConnect.isLogin=true;
@@ -76,8 +68,8 @@ public class SpiderTool {
 			conn.url(oneListUrl);
 			Response rse=null;
 			try{
-				Thread.sleep(40000);
                 rse=conn.ignoreContentType(true).method(Method.GET).execute();//获取响应
+				sleep();
             }catch (Exception ex){
                 rse=conn.ignoreContentType(true).method(Method.POST).execute();//获取响应
             }
@@ -93,12 +85,12 @@ public class SpiderTool {
 			}
 		} catch (Exception e) {
 		    try {
-				Thread.sleep(40000);
+				sleep();
                 doc=Jsoup.connect(oneListUrl).userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12.4; U; fr) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31").timeout(10000).get();
             }catch (Exception ex){
-                log.error(ex.getMessage());
+                CLogManager.error(ex);
             }
-			log.error(e.getMessage());
+			CLogManager.error(e);
 		}finally{
 		    if(doubanConnect!=null)
 			    DoubanConnectPool.freeConnection(doubanConnect);
@@ -137,27 +129,12 @@ public class SpiderTool {
         return false;
     }
 
-	public static String RecognizeCaptcha(String imgsrc){
-		String result=null;
-		try{
-			URL url=new URL(imgsrc);
-			BufferedImage image = ImageIO.read(url);
-			MyImgFilter filter=new MyImgFilter(image);
-			image=filter.changeGrey();
-			ITesseract instance= Tesseract.getInstance();
-			instance.setDatapath(new File(datapath).getPath());
-			result=instance.doOCR(image);
-            result=result.replaceAll("[^a-zA-z]+","");
-		}catch (Exception | Error e){
-			log.error(e.getMessage());
-		}
-		return result;
-	}
 
-	public  WebDriver driver = new ChromeDriver();
-	public  Document GetdocByExplore(String url){
+
+	/*public  Document GetdocByExplore(String url){
 		WebElement doc =null;
 		try {
+			WebDriver driver = new ChromeDriver();
 			driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
 			driver.get(url);
 			WebDriverWait w = new WebDriverWait(driver, 10);
@@ -172,6 +149,6 @@ public class SpiderTool {
 			log.error(e.toString());
 		}
 		return null;
-	}
+	}*/
 
 }

@@ -1,10 +1,11 @@
 package spider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import spider.service.DoubanBookTask;
 import spider.tool.BloomFilter;
+import spider.tool.WorkContext;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -12,32 +13,39 @@ import java.util.concurrent.Executors;
  * project start!
  *
  */
+@Component
 public class App 
 {
-    private static final Logger log = LoggerFactory.getLogger(App.class);
+    @Autowired
+    private DoubanBookTask doubanBookTask;
     private volatile static BloomFilter bloomFilter=new BloomFilter();
     public static ExecutorService fixedThreadPool;
     public static ExecutorService mainTaskThreadPool;
+    private static WorkContext ctx=new WorkContext();
     static {
         fixedThreadPool= Executors.newFixedThreadPool(5);
         mainTaskThreadPool= Executors.newFixedThreadPool(30);
     }
-    public static void main( String[] args ) throws Exception
-    {
-        log.info("程序开始获取数据...");
-        DoubanBookTask doubanBookTask=new DoubanBookTask();
+//    public static void main( String[] args ) throws Exception
+//    {
+//        new App().run();
+//    }
+
+    public void run() throws Exception{
+
+        ctx.info("程序开始获取数据...");
         doubanBookTask.run();
         fixedThreadPool.shutdown();
         mainTaskThreadPool.shutdown();
         while (true){
             if(fixedThreadPool.isTerminated() && mainTaskThreadPool.isTerminated()){
-                log.info("豆瓣读书...");
-                log.info("程序结束.");
+                ctx.info("豆瓣读书...");
+                ctx.info("程序结束.");
                 break;
             }
             Thread.sleep(20000);
         }
-
+        ctx.flush();
     }
 
     public static BloomFilter getBloomFilter() {

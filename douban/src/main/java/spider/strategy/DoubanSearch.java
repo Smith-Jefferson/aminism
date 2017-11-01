@@ -4,6 +4,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import spider.tool.CLogManager;
 import spider.tool.SpiderTool;
 
 import java.net.URLDecoder;
@@ -13,6 +16,7 @@ import java.util.regex.Pattern;
 /**
  * Created by hello world on 2017/1/11.
  */
+@Service
 public class DoubanSearch implements Runnable{
     private String base;
     private String searchName;
@@ -31,7 +35,7 @@ public class DoubanSearch implements Runnable{
         try {
             return URLDecoder.decode(searchName,"utf-8");
         }catch (Exception e){
-            log.error(e.getMessage());
+            CLogManager.error(e);
             return searchName;
         }
     }
@@ -40,7 +44,7 @@ public class DoubanSearch implements Runnable{
         try {
             this.searchName = URLEncoder.encode(searchName,"utf-8");
         }catch (Exception e){
-            log.error(e.getMessage());
+            CLogManager.error(e);
             this.searchName =searchName;
         }
     }
@@ -53,12 +57,14 @@ public class DoubanSearch implements Runnable{
         this.searchType = searchType;
     }
 
-    public DoubanSearch(String base, String searchName, String searchType) {
+    public void init(String base, String searchName, String searchType){
         this.base = base;
         this.searchName = searchName;
         this.searchType = searchType;
     }
 
+    @Autowired
+    private DoubanBookTaskInitServer taskInit;
     @Override
     public void run() {
         String url=base+searchType+"/"+searchName;
@@ -68,9 +74,9 @@ public class DoubanSearch implements Runnable{
 
         Document doc= SpiderTool.Getdoc(url,3,false);
         Elements books=doc.select("a[href]");
-        DoubanBookIndex.addToSchedule(books);
+        taskInit.addToSchedule(books);
         int maxstep=getMaxNum(doc);
-        maxstep=maxstep>3?3:maxstep;
+        //maxstep=maxstep>3?3:maxstep;
         for(int i=2;i<maxstep;i++){
             try {
                 Thread.sleep(2000);
@@ -78,7 +84,7 @@ public class DoubanSearch implements Runnable{
 
             url=getNextPage(base,i);
             if(url!=null){
-                DoubanBookIndex.addToSchedule(SpiderTool.Getdoc(url,3,false).select("a[href]"));
+                taskInit.addToSchedule(SpiderTool.Getdoc(url,3,false).select("a[href]"));
             }else
                 break;
         }

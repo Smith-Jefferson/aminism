@@ -43,6 +43,10 @@ public class DateUtil {
         }
     }
 
+    public static String now(){
+        return formatDate(new Date(),"yyyy-MM-dd kk:mm:ss");
+    }
+
     /**
      * String To Date 字符串转日期格式
      *

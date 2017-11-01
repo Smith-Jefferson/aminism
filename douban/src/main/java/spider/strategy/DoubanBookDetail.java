@@ -1,6 +1,7 @@
 package spider.strategy;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
 import org.hibernate.Session;
@@ -8,44 +9,46 @@ import org.hibernate.Transaction;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import spider.App;
+import spider.database.DoubanDataRep;
 import spider.model.DoubanbookEntity;
 import spider.model.LogLevel;
 import spider.pool.SessionPool;
 import spider.service.LogManager;
+import spider.tool.CLogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
+import spider.tool.WorkContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by hello world on 2017/1/12.
  */
 public class DoubanBookDetail implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(DoubanBookDetail.class);
+    private WorkContext ctx;
     private Set<String> books;
     private DoubanbookEntity  doubanbook;
     public DoubanBookDetail(Set<String> books) {
         this.books = books;
     }
 
+    @Autowired
+    private DoubanDataRep doubanDataRep;
     @Override
     public void run() {
         for (String url:books) {
+            ctx=new WorkContext(url);
             try{
                 task(url);
             }catch (Exception e){
-                log.error(e.getMessage(),e);
-                LogManager.writeLog(e, LogLevel.FATAL,url);
+                CLogManager.error("DoubanBookDetail",e,url);
             }
-
+            ctx.flush();
         }
-        log.info(Thread.currentThread().getName() + ":"  + "结束",Thread.currentThread());
     }
 
     public void task(String url) throws Exception{
@@ -71,22 +74,9 @@ public class DoubanBookDetail implements Runnable {
         setFaceimg(doc);
         setBookname(doc);
         setAuthorintro(doc);
-        Session session= SessionPool.getSession();
-        try {
-            Transaction transaction=session.beginTransaction();
-            if(App.getBloomFilter().ContainedThenAdd(doubanbook.getBookid())){
-                session.update(doubanbook);
-            }else{
-                session.save(doubanbook);
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            log.error(e.getStackTrace().toString());
-            LogManager.writeLog(e);
-        }finally {
-            SessionPool.freeSession(session);
-        }
-        log.info("获取该书的短评");
+        doubanDataRep.saveOrUpdateBookDerail(doubanbook);
+        doubanDataRep.deleteTaskUrl(url);
+        ctx.info("获取该书的短评");
         if(url.endsWith("/")){
             url=url.substring(0,url.length()-1);
         }
@@ -95,17 +85,16 @@ public class DoubanBookDetail implements Runnable {
             App.fixedThreadPool.execute(comment);
             //comment.run();
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            CLogManager.error("task",e,url);
         }
 
-        log.info("获取该书的书评");
+        ctx.info("获取该书的书评");
         DoubanBookReview review=new DoubanBookReview(url+"/reviews");
         try {
             App.fixedThreadPool.execute(review);
             //review.run();
         } catch (Exception e) {
-            log.error(e.getStackTrace().toString());
-            LogManager.writeLog(e,LogLevel.FATAL,url+"/reviews");
+            CLogManager.error("task",e,url);
         }
         Elements ems=doc.getElementsContainingText("二手书欲转让");
         if(ems!=null && ems.size()>0){
@@ -117,11 +106,9 @@ public class DoubanBookDetail implements Runnable {
                 //bookoffer.join();
             }catch (Exception e)
             {
-                log.error(e.getMessage(),e);
+                CLogManager.error("task",e,url);
             }
-
         }
-        SessionPool.freeSession(session);
     }
 
     public void setBooks(Set<String> books) {
@@ -142,7 +129,7 @@ public class DoubanBookDetail implements Runnable {
         try {
             author=doc.select("div.indent").select("div#info").select("a[href]").get(0).text();
         }catch (Exception e){
-            log.error(e.getLocalizedMessage());
+            CLogManager.error("setAuthor",e,doc.select("div.indent").select("div#info").select("a[href]").html());
         }
         doubanbook.setAuthor(author);
     }
@@ -254,8 +241,7 @@ public class DoubanBookDetail implements Runnable {
                 try{
                     doubanbook.setSample(sample.select("div#content").select("div.book-info").text());
                 }catch (Exception e){
-                    log.warn(e.getMessage());
-                    LogManager.writeLog(e,LogLevel.WARM,null);
+                    CLogManager.error("setSample",e);
                 }
             }
         }
@@ -348,7 +334,7 @@ public class DoubanBookDetail implements Runnable {
                 try{
                     liburl=java.net.URLDecoder.decode(liburl,"utf-8");
                 }catch (Exception e){
-                    log.error(e.getMessage());
+                    CLogManager.error("setExtention:liburl",e,liburl);
                 }
                 lib.put("url",liburl);
                 libs.add(lib);
@@ -369,7 +355,7 @@ public class DoubanBookDetail implements Runnable {
                 try{
                     sellerurl=java.net.URLDecoder.decode(sellerurl,"utf-8");
                 }catch (Exception e){
-                    log.error(e.getMessage());
+                    CLogManager.error("setExtention:sellerurl",e,sellerurl);
                 }
                 edition.put("url",sellerurl);
                 if(info.select("span.buylink-price")!=null)

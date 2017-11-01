@@ -1,21 +1,18 @@
 package spider.model;
 
-import net.sf.cglib.beans.BeanCopier;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import spider.App;
 import spider.database.DoubanDataRep;
 import spider.pool.SessionPool;
 
 import javax.persistence.*;
-import java.lang.reflect.Array;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * Created by hello world on 2017/1/10.
@@ -45,30 +42,13 @@ public class UserEntity {
     private Timestamp inserttime;
     private Timestamp updatetime;
 
+    @Autowired
+    private DoubanDataRep doubanDataRep;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "userid", nullable = false)
     public long getUserid() {
-        return userid;
-    }
-    public long getUserID(UserEntity user){
-        StringBuilder str=new StringBuilder();
-        long userid=0;
-        if(App.getBloomFilter().ContainedThenAdd(str.append(user.getDoubanuserid()).append(user.getUname()).toString())){
-            List<UserEntity> tmp= DoubanDataRep.getUsersByName(user.getUname(),user.getDoubanuserid());
-            if(tmp!=null && tmp.size()>0)
-                userid= tmp.get(0).getUserid();
-        }
-        if(userid==0)
-        {
-            Session session= SessionPool.getSession();
-            Transaction transaction=session.beginTransaction();
-            session.save(user);
-            transaction.commit();
-            userid=user.getUserid();
-            SessionPool.freeSession(session);
-        }
-        str.delete(0,str.length());
         return userid;
     }
     @Basic

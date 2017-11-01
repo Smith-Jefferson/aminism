@@ -7,12 +7,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import spider.App;
+import spider.database.DoubanDataRep;
 import spider.model.DoubanbookReviewCommentEntity;
 import spider.model.LogLevel;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
 import spider.service.LogManager;
+import spider.tool.CLogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -23,6 +26,8 @@ import java.text.ParseException;
  * Created by hello world on 2017/1/16.
  */
 public class DoubanBookReviewComment implements Runnable{
+    @Autowired
+    private DoubanDataRep doubanDataRep;
     private static final Logger log = LoggerFactory.getLogger(DoubanBookReviewComment.class);
     private Document doc;
     private String baseUrl;
@@ -58,7 +63,7 @@ public class DoubanBookReviewComment implements Runnable{
         try {
             Thread.sleep(4000);
         }catch (Exception e){
-            log.error(e.getMessage(),e);
+            CLogManager.error(e);
         }
         Elements comments=doc.select("div#comments").select("div.comment-item");
         task(comments);
@@ -82,24 +87,21 @@ public class DoubanBookReviewComment implements Runnable{
                 try {
                     Thread.sleep(4000);
                 }catch (Exception e){
-                    log.error(e.getMessage(),e);
+                    CLogManager.error(e);
                 }
                 doc=SpiderTool.Getdoc(url,3,false);
                 comments=doc.select("div#comments").select("div.comment-item");
                 task(comments);
             } catch (Exception e) {
-                log.error(e.getStackTrace().toString());
-                LogManager.writeLog(e, LogLevel.FATAL,url);
+                CLogManager.error(e);
             }
         }
     }
 
     public void task(Elements comments){
-        Session session=null;
         StringBuilder str=new StringBuilder();
         for (Element el:comments) {
             try {
-                session= SessionPool.getSession();
                 DoubanbookReviewCommentEntity commet=new DoubanbookReviewCommentEntity();
                 String doubanuserid= getDoubanUserid(el);
                 UserEntity user=new UserEntity();
@@ -107,7 +109,7 @@ public class DoubanBookReviewComment implements Runnable{
                 user.setAvatar(getAvatar(el));
                 user.setFlag(0);
                 user.setUname(getUserName(el));
-                long userid=user.getUserID(user);
+                long userid=doubanDataRep.getUserID(user);
                 commet.setBookid(getBookid());
                 commet.setReviewid(getReviewid());
                 commet.setUserid(userid);
@@ -115,15 +117,11 @@ public class DoubanBookReviewComment implements Runnable{
                 commet.setComment(getComment(el));
                 commet.setRatedate(getRatedate(el));
                 if(!App.getBloomFilter().ContainedThenAdd(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
-                    Transaction transaction=session.beginTransaction();
-                    session.save(commet);
-                    transaction.commit();
+                    doubanDataRep.saveReviewComment(commet);
                 }
                 str.delete(0,str.length());
             }catch (Exception e){
-                log.error(el.toString()+e.getMessage(),e);
-            }finally {
-                SessionPool.freeSession(session);
+                CLogManager.error(e);
             }
         }
     }
@@ -152,7 +150,7 @@ public class DoubanBookReviewComment implements Runnable{
         try {
             time = DateUtil.string2Time(date,"yyyy-MM-dd HH:mm:ss");
         } catch (ParseException e) {
-            log.error(e.getMessage());
+            CLogManager.error(e);
         }
         return time;
     }

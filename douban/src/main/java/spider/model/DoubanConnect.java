@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spider.service.DoubanBookTask;
+import spider.tool.CLogManager;
 import spider.tool.SpiderTool;
 
 import java.net.InetAddress;
@@ -100,7 +101,7 @@ public class DoubanConnect extends CloneableBase{
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            log.error(e.getMessage(),e);
+            CLogManager.error(e);
         }
 
     }

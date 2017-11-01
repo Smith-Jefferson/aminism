@@ -1,61 +1,67 @@
 package spider.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import spider.App;
 import spider.database.DoubanDataRep;
 import spider.model.DoubanbookCommentEntity;
 import spider.model.DoubanbookReviewCommentEntity;
 import spider.model.DoubanbookReviewEntity;
 import spider.model.UserEntity;
-import spider.strategy.AgentFetcher;
-import spider.strategy.DoubanBookIndex;
+import spider.strategy.DoubanBookTaskInitServer;
 import spider.tool.SpiderTool;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 
 /**
  * Created by hello world on 2017/1/10.
  */
+@Service
 public class InitailTask {
-    public static void initailDoubanBook(){
-        List<Long> bookIDs= DoubanDataRep.getDoubanBook();
+    @Autowired
+    private DoubanDataRep dataRep;
+
+    public void initailDoubanBook(){
+        List<Long> bookIDs= dataRep.getDoubanBook();
         App.getBloomFilter().addAll(bookIDs);
     }
-    public static void initailDoubanBookComment(){
-        List<DoubanbookCommentEntity> books=DoubanDataRep.getDoubanbookComment();
+    public void initailDoubanBookComment(){
+        List<DoubanbookCommentEntity> books=dataRep.getDoubanbookComment();
         StringBuilder str=new StringBuilder();
         for (DoubanbookCommentEntity comment:books) {
             App.getBloomFilter().add(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString());
             str.delete(0,str.length());
         }
     }
-    public static void initialDoubanBookReview(){
-        List<DoubanbookReviewEntity> books=DoubanDataRep.getDoubanbookReview();
+    public void initialDoubanBookReview(){
+        List<DoubanbookReviewEntity> books=dataRep.getDoubanbookReview();
         StringBuilder str=new StringBuilder();
         for (DoubanbookReviewEntity bookreview:books) {
             App.getBloomFilter().add(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString());
             str.delete(0,str.length());
         }
     }
-    public static void initialDoubanBookReviewComment(){
-        List<DoubanbookReviewCommentEntity> reviewComments=DoubanDataRep.getDoubanbookReviewCommet();
+    public void initialDoubanBookReviewComment(){
+        List<DoubanbookReviewCommentEntity> reviewComments=dataRep.getDoubanbookReviewCommet();
         StringBuilder str=new StringBuilder();
         for (DoubanbookReviewCommentEntity comment:reviewComments) {
             App.getBloomFilter().add(str.append(comment.getDoubanuserid()).append(comment.getBookid()).append(comment.getReviewid()).toString());
             str.delete(0,str.length());
         }
     }
-    public static void initailDoubanUser(){
-        List<UserEntity> userlist=DoubanDataRep.getDoubanUser();
+    public void initailDoubanUser(){
+        List<UserEntity> userlist=dataRep.getDoubanUser();
         StringBuilder str=new StringBuilder();
         for (UserEntity user:userlist) {
             App.getBloomFilter().add(str.append(user.getDoubanuserid()).append(user.getUname()).toString());
             str.delete(0,str.length());
         }
     }
-    public static void initailDoubanbookSchedule(){
+
+    @Autowired
+    private DoubanBookTaskInitServer taskInitServer;
+    public void initailDoubanbookSchedule(){
         SpiderTool.initailAgent();
-        DoubanBookIndex.getBookUrl();
+        taskInitServer.getBookUrl();
     }
 }

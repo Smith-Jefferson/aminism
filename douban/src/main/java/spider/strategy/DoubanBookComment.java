@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import spider.App;
 import spider.database.DoubanDataRep;
 import spider.model.DoubanbookCommentEntity;
@@ -14,6 +15,7 @@ import spider.model.LogLevel;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
 import spider.service.LogManager;
+import spider.tool.CLogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -25,6 +27,8 @@ import java.util.List;
  */
 public class DoubanBookComment implements Runnable{
     private static final Logger log = LoggerFactory.getLogger(DoubanBookComment.class);
+    @Autowired
+    private DoubanDataRep doubanDataRep;
     private String url;
     private long bookID;
     private int pageCount=1;
@@ -42,8 +46,7 @@ public class DoubanBookComment implements Runnable{
             task(url);
         }
         catch (Exception e) {
-            log.error(e.getStackTrace().toString());
-            LogManager.writeLog(e, LogLevel.FATAL,url);
+            CLogManager.error(e);
         }
     }
 
@@ -60,9 +63,8 @@ public class DoubanBookComment implements Runnable{
             user.setUname(getUserName(el));
             user.setAvatar(getUserAvatar(el));
             user.setFlag(0);
-            long userid=user.getUserID(user);
+            long userid=doubanDataRep.getUserID(user);
             try {
-                session= SessionPool.getSession();
                 comment.setUserid(userid);
                 comment.setBookid(bookID);
                 comment.setDoubanuserid(user.getDoubanuserid());
@@ -71,14 +73,10 @@ public class DoubanBookComment implements Runnable{
                 comment.setRatedate(getRateDate(el));
                 comment.setFollownum(getFollownum(el));
                 if(!App.getBloomFilter().ContainedThenAdd(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString())){
-                    Transaction transaction=session.beginTransaction();
-                    session.save(comment);
-                    transaction.commit();
-                    SessionPool.freeSession(session);
+                    doubanDataRep.saveComment(comment);
                 }
             }catch (Exception e){
-                log.error(el.toString(),e);
-                LogManager.writeLog(e, LogLevel.FATAL,el.toString());
+                CLogManager.error(e);
             }
 
             str.delete(0,str.length());
@@ -89,7 +87,7 @@ public class DoubanBookComment implements Runnable{
             try {
                 Thread.sleep(4000);
             }catch (Exception e){
-                log.error(e.getMessage(),e);
+                CLogManager.error(e);
             }
             task(url+"hot?p="+currentPage);
         }
@@ -136,7 +134,7 @@ public class DoubanBookComment implements Runnable{
             ratedate= element.select("span.comment-info").select("span").last().text();
             return DateUtil.toSqlDate(DateUtil.parseDate(ratedate,"yyyy-MM-dd"));
         }catch (Exception e){
-            log.error(ratedate+e.getMessage());
+            CLogManager.error(e);
         }
         return new Date(System.currentTimeMillis());
     }

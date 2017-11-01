@@ -3,6 +3,7 @@ package spider;
 import org.junit.Test; 
 import org.junit.Before; 
 import org.junit.After;
+import spider.tool.OCRServer;
 import spider.tool.SpiderTool;
 
 /** 
@@ -55,7 +56,7 @@ public void testSetBloomFilter() throws Exception {
 @Test
 public void testRecoginzeCaptcha(){
     String image="https://www.douban.com/misc/captcha?id=rR24CC3LLbAbIJ2nxtKBIeJp:en&size=s";
-    String s= SpiderTool.RecognizeCaptcha(image);
+    String s= new OCRServer().RecognizeCaptcha(image);
     System.out.printf(s);
 }
 

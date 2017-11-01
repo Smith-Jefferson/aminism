@@ -7,10 +7,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import spider.database.DoubanDataRep;
 import spider.model.DoubanbookOfferEntity;
 import spider.model.UserEntity;
 import spider.pool.SessionPool;
 import spider.service.LogManager;
+import spider.tool.CLogManager;
 import spider.tool.DateUtil;
 import spider.tool.SpiderTool;
 
@@ -20,6 +23,8 @@ import java.sql.Timestamp;
  * Created by hello world on 2017/1/20.
  */
 public class DoubanbookOffer implements Runnable{
+    @Autowired
+    private DoubanDataRep doubanDataRep;
     private String url;
     private static final Logger log = LoggerFactory.getLogger(DoubanbookOffer.class);
     private int max;
@@ -48,39 +53,31 @@ public class DoubanbookOffer implements Runnable{
         }
     }
     public void task(Document doc){
-        Session session;
-        Transaction transaction;
         Elements content=doc.select("div#content");
         if(content!=null){
             content=content.select("table");
-            if (content.size()>0)
+            if (!content.isEmpty())
             {
                 content.remove(0);
                 for (Element el:content) {
                     try{
-                        session= SessionPool.getSession();
                         DoubanbookOfferEntity offer=new DoubanbookOfferEntity();
                         UserEntity user=new UserEntity();
                         user.setFlag(0);
                         user.setAvatar(getAvatar(el));
                         user.setDoubanuserid(getDoubanuserid(el));
                         user.setUname(getUname(el));
-                        long userid=user.getUserID(user);
+                        long userid=doubanDataRep.getUserID(user);
                         offer.setUserid(userid);
                         offer.setBookid(getBookid(url));
                         offer.setPrice(getPrice(el));
                         offer.setOfferdate(getDate(el));
                         offer.setMark(getRemark(el));
-                        transaction=session.beginTransaction();
-                        session.save(offer);
-                        transaction.commit();
-                        //SessionPool.freeSession(session);
+                        doubanDataRep.saveBookOffer(offer);
                     }
                     catch (Exception e){
-                        log.error(e.getStackTrace().toString());
-                        LogManager.writeLog(e);
+                        CLogManager.error(e);
                     }
-
                 }
             }
 
@@ -127,7 +124,7 @@ public class DoubanbookOffer implements Runnable{
         try {
             time=DateUtil.string2Time(date,"yyyy-MM-dd");
         }catch (Exception e){
-            log.error(e.getMessage());
+            CLogManager.error(e);
         }
         return time;
     }
