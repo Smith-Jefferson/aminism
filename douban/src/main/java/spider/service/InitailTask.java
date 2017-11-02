@@ -9,6 +9,7 @@ import spider.model.DoubanbookReviewCommentEntity;
 import spider.model.DoubanbookReviewEntity;
 import spider.model.UserEntity;
 import spider.strategy.DoubanBookTaskInitServer;
+import spider.tool.CLogManager;
 import spider.tool.SpiderTool;
 
 import java.util.List;
@@ -61,7 +62,11 @@ public class InitailTask {
     @Autowired
     private DoubanBookTaskInitServer taskInitServer;
     public void initailDoubanbookSchedule(){
-        SpiderTool.initailAgent();
-        taskInitServer.getBookUrl();
+        try {
+            SpiderTool.initailAgent();
+            taskInitServer.getBookUrl();
+        }catch (Exception e){
+            CLogManager.error(e);};
+
     }
 }

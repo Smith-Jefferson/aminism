@@ -6,8 +6,6 @@ import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spider.model.DoubanConnect;
 import spider.pool.DoubanConnectPool;
 import spider.strategy.AgentFetcher;
@@ -18,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class SpiderTool {
-	private static final Logger log = LoggerFactory.getLogger(SpiderTool.class);
+	//private static final Logger log = LoggerFactory.getLogger(SpiderTool.class);
 	private static volatile String[][] agent=new String[4][2];//代理服务器
 	private static AtomicInteger up=new AtomicInteger(0);
 	private static AtomicInteger down=new AtomicInteger(0);
@@ -31,7 +29,7 @@ public class SpiderTool {
 		} catch (Exception e) {
 			CLogManager.error(e);
 		}
-		log.info("当前获取代理ip条数："+Math.abs(up.get()-down.get()));
+		CLogManager.info("aminism","当前获取代理ip条数："+Math.abs(up.get()-down.get()));
 	}
 	public static synchronized Map<String,String> getAgent() {
 		Map<String,String> proxy=new HashMap<String,String>(2);
@@ -71,6 +69,7 @@ public class SpiderTool {
                 rse=conn.ignoreContentType(true).method(Method.GET).execute();//获取响应
 				sleep();
             }catch (Exception ex){
+				CLogManager.error(ex);
                 rse=conn.ignoreContentType(true).method(Method.POST).execute();//获取响应
             }
 			doc = Jsoup.parse(rse.body());//转换为Dom树

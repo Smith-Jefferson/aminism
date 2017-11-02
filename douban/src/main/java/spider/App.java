@@ -23,8 +23,8 @@ public class App
     public static ExecutorService mainTaskThreadPool;
     private static WorkContext ctx=new WorkContext();
     static {
-        fixedThreadPool= Executors.newFixedThreadPool(5);
-        mainTaskThreadPool= Executors.newFixedThreadPool(30);
+        fixedThreadPool= Executors.newFixedThreadPool(3);
+        mainTaskThreadPool= Executors.newFixedThreadPool(5);
     }
 //    public static void main( String[] args ) throws Exception
 //    {

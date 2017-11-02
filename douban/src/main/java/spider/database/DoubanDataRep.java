@@ -2,15 +2,14 @@ package spider.database;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import spider.App;
 import spider.model.*;
-import spider.pool.SessionPool;
-import spider.strategy.DoubanBookDetail;
-
+import spider.tool.CLogManager;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -124,5 +123,37 @@ public class DoubanDataRep {
 
     public void deleteTaskUrl(String url){
         getSession().delete(new TaskUrlEntity(url));
+    }
+
+    public void addToSchedule(Elements books){
+        if(books==null)return;
+        for (Element book:books) {
+            if(book==null)return;
+            addToSchedule(book);
+        }
+    }
+    public void addToSchedule(Element book){
+        String url=book.attr("abs:href");
+        addToSchedule(url);
+    }
+
+    public void addToSchedule(String url){
+        if(isBookUrl(url)){
+            try {
+                String bookid=url.split("subject/")[1].split("/")[0];
+                url="https://book.douban.com/subject/"+bookid;
+                if(!App.getBloomFilter().contains(bookid)){
+                    saveTaskUrl(new TaskUrlEntity(url));
+                }
+            } catch (Exception e) {
+                CLogManager.error(e);
+            }
+        }
+    }
+
+    public static boolean isBookUrl(String url){
+        if (url!=null&&url.contains("book") && url.contains("com/subject"))
+            return true;
+        return false;
     }
 }

@@ -2,10 +2,9 @@ package spider.strategy;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spider.database.DoubanDataRep;
 import spider.tool.CLogManager;
 import spider.tool.SpiderTool;
 
@@ -21,7 +20,6 @@ public class DoubanSearch implements Runnable{
     private String base;
     private String searchName;
     private String searchType;
-    private static final Logger log = LoggerFactory.getLogger(DoubanSearch.class);
 
     public String getBase() {
         return base;
@@ -64,28 +62,42 @@ public class DoubanSearch implements Runnable{
     }
 
     @Autowired
-    private DoubanBookTaskInitServer taskInit;
+    private DoubanDataRep taskInit;
+    private void sleep(){
+        try {
+            Thread.sleep(2000);
+        }catch (Exception e){
+            CLogManager.error(e);
+        }
+    }
+
+    private  int errorallowed=2;
     @Override
     public void run() {
         String url=base+searchType+"/"+searchName;
-        try {
-            Thread.sleep(2000);
-        }catch (Exception e){}
+        sleep();
 
         Document doc= SpiderTool.Getdoc(url,3,false);
+        if(doc==null) return;
         Elements books=doc.select("a[href]");
         taskInit.addToSchedule(books);
         int maxstep=getMaxNum(doc);
         //maxstep=maxstep>3?3:maxstep;
         for(int i=2;i<maxstep;i++){
-            try {
-                Thread.sleep(2000);
-            }catch (Exception e){}
+            sleep();
 
             url=getNextPage(base,i);
             if(url!=null){
-                taskInit.addToSchedule(SpiderTool.Getdoc(url,3,false).select("a[href]"));
-            }else
+                try {
+                    taskInit.addToSchedule(SpiderTool.Getdoc(url,3,false).select("a[href]"));
+                }
+                catch (Exception e){
+                    CLogManager.error(e);
+                    if(errorallowed--<=0)
+                        break;
+                }
+            }
+            else
                 break;
         }
     }

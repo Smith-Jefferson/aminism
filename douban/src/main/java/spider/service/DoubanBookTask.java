@@ -9,7 +9,6 @@ import spider.tool.CLogManager;
 import spider.tool.WorkContext;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -56,23 +55,27 @@ public class DoubanBookTask implements Runnable {
 		Set<String> detailurls;
 		synchronized (DoubanBookTask.bookSchedule){
 			detailurls=new HashSet<String>(bookSchedule.size());
-			ctx.info("新的任务清单长度："+detailurls.size());
+			ctx.info("新的任务清单长度："+bookSchedule.size());
 			for (int i=0;i<bookSchedule.size();i++) {
 				detailurls.add(bookSchedule.poll());
 			}
 			bookSchedule.clear();
 		}
-		int taskNum=1;
-		Set<String> taskSet=null;
+		int taskNum=5;
+		int singleRuns=1;
+		Set<String> taskSet=new HashSet<String>(taskNum);
 		for (String url:detailurls) {
 			if(--taskNum>0){
 				taskSet.add(url);
 			}else{
 				taskNum=5;
 				ctx.info("开启新线程,线程内任务数："+taskNum);
-				taskSet=new HashSet<String>(taskNum);
 				DoubanBookDetail doubanBookDetailetial=new DoubanBookDetail(taskSet);
-				App.mainTaskThreadPool.execute(doubanBookDetailetial);
+				if(singleRuns-->0)
+					doubanBookDetailetial.run();
+				else
+					App.mainTaskThreadPool.execute(doubanBookDetailetial);
+				taskSet=new HashSet<String>(taskNum);
 			}
 		}
 		ctx.info(Thread.currentThread().getName() + "当前任务结束");
