@@ -3,8 +3,7 @@ package spider;
 import org.junit.Test; 
 import org.junit.Before; 
 import org.junit.After;
-import spider.tool.OCRServer;
-import spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.OCRServer;
 
 /** 
 * App Tester. 

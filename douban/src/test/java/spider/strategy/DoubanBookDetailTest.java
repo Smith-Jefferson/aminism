@@ -1,5 +1,7 @@
 package spider.strategy;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanBookDetail;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanbookOffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -15,6 +15,7 @@
  */
 package spider.tool;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.MyImgFilter;
 import com.recognition.software.jdeskew.ImageDeskew;
 import net.sourceforge.tess4j.ITessAPI.TessPageIteratorLevel;
 import net.sourceforge.tess4j.ITesseract;

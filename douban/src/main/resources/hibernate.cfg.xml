@@ -4,18 +4,18 @@
                 "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 <session-factory>
-    <mapping class="spider.model.DoubanactivityEntity"/>
-    <mapping class="spider.model.DoubanbookEntity"/>
-    <mapping class="spider.model.DoubanbookCommentEntity"/>
-    <mapping class="spider.model.DoubanbookReviewEntity"/>
-    <mapping class="spider.model.DoubanbookReviewCommentEntity"/>
-    <mapping class="spider.model.DoubangroupEntity"/>
-    <mapping class="spider.model.DoubanmovieEntity"/>
-    <mapping class="spider.model.DoubanmusicEntity"/>
-    <mapping class="spider.model.UserEntity"/>
-    <mapping class="spider.model.DoubanrateEntity"/>
-    <mapping class="spider.model.DoubanbookOfferEntity"/>
-    <mapping class="spider.model.LogEntity"/>
-    <mapping class="spider.model.TaskUrlEntity"></mapping>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanactivityEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookCommentEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookReviewEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookReviewCommentEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubangroupEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanmovieEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanmusicEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.UserEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanrateEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookOfferEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.LogEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.TaskUrlEntity"></mapping>
 </session-factory>
 </hibernate-configuration>

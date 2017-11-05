@@ -1,5 +1,7 @@
 package spider.tool;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.BloomFilter;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 import org.junit.Test;
 import static org.junit.Assert.*;
 /**
@@ -24,7 +26,7 @@ public class BloomFilterTest {
 
     @Test
     public void TestIsNo(){
-        boolean f=SpiderTool.isNo("3.1");
+        boolean f= SpiderTool.isNo("3.1");
         assertTrue(f);
     }
 }

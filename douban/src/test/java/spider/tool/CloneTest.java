@@ -3,7 +3,7 @@ package spider.tool;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.junit.Test;
-import spider.model.DoubanConnect;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanConnect;
 
 /**
  * Created by xieyigang on 2017/7/21.

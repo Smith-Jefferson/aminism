@@ -4,7 +4,7 @@ import org.jsoup.nodes.Document;
 import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
-import spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 import static org.junit.Assert.*;
 /** 
 * SpiderTool Tester. 
