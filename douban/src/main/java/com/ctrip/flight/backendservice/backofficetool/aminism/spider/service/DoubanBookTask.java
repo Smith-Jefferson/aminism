@@ -1,10 +1,9 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.service;
 
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanBookDetail;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.WorkContext;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

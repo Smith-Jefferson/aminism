@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+                "-//Hibernate/Hibernate Configuration DTD//EN"
+                "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+<session-factory>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanactivityEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookCommentEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookReviewEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookReviewCommentEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubangroupEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanmovieEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanmusicEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.UserEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanrateEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookOfferEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.LogEntity"/>
+    <mapping class="com.ctrip.flight.backendservice.backofficetool.spider.entity.TaskUrlEntity"></mapping>
+</session-factory>
+</hibernate-configuration>

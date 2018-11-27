@@ -9,7 +9,7 @@
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
-      classpath:rootContext.xml
+        classpath:ApplicationContext.xml
     </param-value>
   </context-param>
 
@@ -28,7 +28,7 @@
 
     <init-param>
       <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:rootContext.xml</param-value>
+      <param-value>classpath:ApplicationContext.xml</param-value>
     </init-param>
 
     <load-on-startup>1</load-on-startup>

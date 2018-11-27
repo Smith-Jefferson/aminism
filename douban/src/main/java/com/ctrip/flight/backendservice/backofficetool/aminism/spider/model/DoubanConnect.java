@@ -1,14 +1,13 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.model;
-
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.DoubanBookTask;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.DoubanBookTask;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 import java.net.InetAddress;
 import java.util.HashMap;
