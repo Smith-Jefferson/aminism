@@ -1,8 +1,8 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.service;
 
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.LogEntity;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.LogLevel;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.pool.SessionPool;
+import com.ctrip.flight.backendservice.backofficetool.spider.connect.SessionPool;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.LogEntity;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 

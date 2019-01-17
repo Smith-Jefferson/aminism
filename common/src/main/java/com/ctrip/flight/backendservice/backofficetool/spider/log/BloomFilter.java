@@ -1,4 +1,4 @@
-package com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool;
+package com.ctrip.flight.backendservice.backofficetool.spider.log;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;

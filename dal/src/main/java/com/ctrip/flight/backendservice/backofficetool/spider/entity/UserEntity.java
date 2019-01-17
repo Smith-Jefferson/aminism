@@ -1,6 +1,6 @@
 package com.ctrip.flight.backendservice.backofficetool.spider.entity;
 
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
 import org.springframework.beans.factory.annotation.Autowired;

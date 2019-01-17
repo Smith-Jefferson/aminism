@@ -1,5 +1,6 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool;
 
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 

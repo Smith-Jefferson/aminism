@@ -1,5 +1,13 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.DateUtil;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookReviewEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.UserEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.BloomFilterUtil;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import com.google.common.base.Joiner;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -7,13 +15,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookReviewEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.UserEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.DateUtil;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -89,7 +90,7 @@ public class DoubanBookReview implements Runnable {
                 bookreview.setRatedate(getRatedate(review));
                 bookreview.setReviewRecusers(getReviewRecusers(reviewUrl));
                 bookreview.setReviewLikeuser(getReviewLikeuser(reviewUrl));
-                if(!App.getBloomFilter().ContainedThenAdd(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString())){
+                if(!BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString())){
                     doubanDataRep.saveReview(bookreview);
                 }
                 try{

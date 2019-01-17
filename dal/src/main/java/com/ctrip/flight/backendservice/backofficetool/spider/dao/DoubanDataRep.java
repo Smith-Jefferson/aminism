@@ -2,14 +2,15 @@ package com.ctrip.flight.backendservice.backofficetool.spider.dao;
 
 
 import com.ctrip.flight.backendservice.backofficetool.spider.entity.*;
-
+import com.ctrip.flight.backendservice.backofficetool.spider.log.BloomFilterUtil;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 /**
  * Created by hello world on 2017/1/11.
  */
-@Repository
+@Component
 public class DoubanDataRep {
     @Autowired
     private SessionFactory sessionFactory;
@@ -61,7 +62,7 @@ public class DoubanDataRep {
     public long getUserID(UserEntity user){
         StringBuilder str=new StringBuilder();
         long userid=0;
-        if(App.getBloomFilter().ContainedThenAdd(str.append(user.getDoubanuserid()).append(user.getUname()).toString())){
+        if(BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(user.getDoubanuserid()).append(user.getUname()).toString())){
             List<UserEntity> tmp= getUsersByName(user.getUname(),user.getDoubanuserid());
             if(tmp!=null && !tmp.isEmpty())
                 userid= tmp.get(0).getUserid();
@@ -87,7 +88,7 @@ public class DoubanDataRep {
 
     @Transactional
     public void saveOrUpdateBookDerail(DoubanbookEntity detail){
-        if(App.getBloomFilter().ContainedThenAdd(detail.getBookid())){
+        if(BloomFilterUtil.getBloomFilter().ContainedThenAdd(detail.getBookid())){
             getSession().update(detail);
         }else{
             getSession().save(detail);
@@ -142,7 +143,7 @@ public class DoubanDataRep {
             try {
                 String bookid=url.split("subject/")[1].split("/")[0];
                 url="https://book.douban.com/subject/"+bookid;
-                if(!App.getBloomFilter().contains(bookid)){
+                if(!BloomFilterUtil.getBloomFilter().contains(bookid)){
                     saveTaskUrl(new TaskUrlEntity(url));
                 }
             } catch (Exception e) {

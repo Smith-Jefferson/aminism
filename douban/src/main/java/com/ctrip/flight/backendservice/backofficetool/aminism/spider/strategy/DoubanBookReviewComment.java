@@ -1,12 +1,12 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy;
 
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookReviewCommentEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.UserEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.DateUtil;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookReviewCommentEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.UserEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.BloomFilterUtil;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -111,7 +111,7 @@ public class DoubanBookReviewComment implements Runnable{
                 commet.setDoubanuserid(doubanuserid);
                 commet.setComment(getComment(el));
                 commet.setRatedate(getRatedate(el));
-                if(!App.getBloomFilter().ContainedThenAdd(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
+                if(!BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
                     doubanDataRep.saveReviewComment(commet);
                 }
                 str.delete(0,str.length());

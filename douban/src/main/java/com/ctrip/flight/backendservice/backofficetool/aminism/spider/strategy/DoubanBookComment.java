@@ -1,5 +1,12 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.DateUtil;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookCommentEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.UserEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.BloomFilterUtil;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.hibernate.Session;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -7,13 +14,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookCommentEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.UserEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.DateUtil;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 import java.sql.Date;
 
@@ -67,7 +67,7 @@ public class DoubanBookComment implements Runnable{
                 comment.setComment(getComment(el));
                 comment.setRatedate(getRateDate(el));
                 comment.setFollownum(getFollownum(el));
-                if(!App.getBloomFilter().ContainedThenAdd(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString())){
+                if(!BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString())){
                     doubanDataRep.saveComment(comment);
                 }
             }catch (Exception e){

@@ -1,7 +1,6 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.controller;
 
-
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -1,5 +1,6 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool;
 
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;

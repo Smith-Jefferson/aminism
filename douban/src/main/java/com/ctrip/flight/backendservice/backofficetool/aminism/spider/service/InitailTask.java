@@ -1,16 +1,17 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.service;
 
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookReviewCommentEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.UserEntity;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanBookTaskInitServer;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookCommentEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookReviewCommentEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookReviewEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.UserEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.BloomFilterUtil;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookCommentEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookReviewEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 import java.util.List;
 
@@ -19,18 +20,22 @@ import java.util.List;
  */
 @Service
 public class InitailTask {
-    @Autowired
+
     private DoubanDataRep dataRep;
+    @Autowired
+    public void setDataRep(DoubanDataRep dataRep) {
+        this.dataRep = dataRep;
+    }
 
     public void initailDoubanBook(){
         List<Long> bookIDs= dataRep.getDoubanBook();
-        App.getBloomFilter().addAll(bookIDs);
+        BloomFilterUtil.getBloomFilter().addAll(bookIDs);
     }
     public void initailDoubanBookComment(){
         List<DoubanbookCommentEntity> books=dataRep.getDoubanbookComment();
         StringBuilder str=new StringBuilder();
         for (DoubanbookCommentEntity comment:books) {
-            App.getBloomFilter().add(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString());
+            BloomFilterUtil.getBloomFilter().add(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString());
             str.delete(0,str.length());
         }
     }
@@ -38,7 +43,7 @@ public class InitailTask {
         List<DoubanbookReviewEntity> books=dataRep.getDoubanbookReview();
         StringBuilder str=new StringBuilder();
         for (DoubanbookReviewEntity bookreview:books) {
-            App.getBloomFilter().add(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString());
+            BloomFilterUtil.getBloomFilter().add(str.append(bookreview.getDoubanuserid()).append(bookreview.getBookid()).append("review").toString());
             str.delete(0,str.length());
         }
     }
@@ -46,7 +51,7 @@ public class InitailTask {
         List<DoubanbookReviewCommentEntity> reviewComments=dataRep.getDoubanbookReviewCommet();
         StringBuilder str=new StringBuilder();
         for (DoubanbookReviewCommentEntity comment:reviewComments) {
-            App.getBloomFilter().add(str.append(comment.getDoubanuserid()).append(comment.getBookid()).append(comment.getReviewid()).toString());
+            BloomFilterUtil.getBloomFilter().add(str.append(comment.getDoubanuserid()).append(comment.getBookid()).append(comment.getReviewid()).toString());
             str.delete(0,str.length());
         }
     }
@@ -54,7 +59,7 @@ public class InitailTask {
         List<UserEntity> userlist=dataRep.getDoubanUser();
         StringBuilder str=new StringBuilder();
         for (UserEntity user:userlist) {
-            App.getBloomFilter().add(str.append(user.getDoubanuserid()).append(user.getUname()).toString());
+            BloomFilterUtil.getBloomFilter().add(str.append(user.getDoubanuserid()).append(user.getUname()).toString());
             str.delete(0,str.length());
         }
     }

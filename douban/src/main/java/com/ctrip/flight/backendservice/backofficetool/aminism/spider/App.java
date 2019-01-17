@@ -1,10 +1,9 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.DoubanBookTask;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.WorkContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.DoubanBookTask;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.BloomFilter;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +17,7 @@ public class App
 {
     @Autowired
     private DoubanBookTask doubanBookTask;
-    private volatile static BloomFilter bloomFilter=new BloomFilter();
+
     public static ExecutorService fixedThreadPool;
     public static ExecutorService mainTaskThreadPool;
     private static WorkContext ctx=new WorkContext();
@@ -48,11 +47,4 @@ public class App
         ctx.flush();
     }
 
-    public static BloomFilter getBloomFilter() {
-        return bloomFilter;
-    }
-
-    public static void setBloomFilter(BloomFilter bloomFilter) {
-        App.bloomFilter = bloomFilter;
-    }
 }

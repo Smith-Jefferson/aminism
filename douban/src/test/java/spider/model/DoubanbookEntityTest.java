@@ -1,6 +1,6 @@
 package spider.model;
 
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

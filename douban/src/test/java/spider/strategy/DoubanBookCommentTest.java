@@ -1,12 +1,13 @@
 package spider.strategy;
+
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.InitailTask;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanBookComment;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanBookReview;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.DoubanBookReviewComment;
+import com.ctrip.flight.backendservice.backofficetool.spider.connect.SessionPool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.pool.SessionPool;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.InitailTask;
 
 /**
  * Created by hello world on 2017/1/14.

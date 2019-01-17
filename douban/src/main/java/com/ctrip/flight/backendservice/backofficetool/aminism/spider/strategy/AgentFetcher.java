@@ -1,12 +1,12 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy;
 
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

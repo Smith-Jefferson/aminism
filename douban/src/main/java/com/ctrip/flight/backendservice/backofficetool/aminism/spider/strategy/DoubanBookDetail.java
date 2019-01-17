@@ -3,19 +3,19 @@ package com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.LogLevel;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.LogManager;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.DateUtil;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.WorkContext;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.entity.DoubanbookEntity;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import com.google.common.base.Joiner;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanbookEntity;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.service.LogManager;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.Set;
 public class DoubanBookDetail implements Runnable {
     private WorkContext ctx;
     private Set<String> books;
-    private DoubanbookEntity  doubanbook;
+    private DoubanbookEntity doubanbook;
     public DoubanBookDetail(Set<String> books) {
         this.books = books;
     }

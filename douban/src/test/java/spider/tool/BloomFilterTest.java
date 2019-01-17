@@ -1,6 +1,6 @@
 package spider.tool;
 
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.BloomFilter;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.BloomFilter;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 import org.junit.Test;
 import static org.junit.Assert.*;

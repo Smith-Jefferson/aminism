@@ -1,14 +1,14 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy;
 
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.database.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
+import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
+import com.ctrip.flight.backendservice.backofficetool.spider.dao.DoubanDataRep;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.App;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.CLogManager;
-import com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool.SpiderTool;
 
 /**
  * Created by hello world on 2017/1/11.

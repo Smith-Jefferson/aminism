@@ -1,5 +1,6 @@
 package com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool;
 
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import com.google.common.base.Stopwatch;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

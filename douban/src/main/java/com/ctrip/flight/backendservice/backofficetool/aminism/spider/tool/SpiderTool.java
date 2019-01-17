@@ -3,6 +3,7 @@ package com.ctrip.flight.backendservice.backofficetool.aminism.spider.tool;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.model.DoubanConnect;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.pool.DoubanConnectPool;
 import com.ctrip.flight.backendservice.backofficetool.aminism.spider.strategy.AgentFetcher;
+import com.ctrip.flight.backendservice.backofficetool.spider.log.CLogManager;
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
