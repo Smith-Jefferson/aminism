@@ -2,13 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>aminism</artifactId>
-        <groupId>com.ctrip.flight.backendservice.backofficetool.spider</groupId>
+        <groupId>org.aminism.spider</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>1.0.0</version>
     <artifactId>douban</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>douban</name>
     <url>http://maven.apache.org</url>
@@ -17,32 +16,14 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.ctrip.framework</groupId>
-                <artifactId>framework-bom</artifactId>
-                <version>1.1.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <dependencies>
-
-        <!-- optional -->
-        <dependency>
-            <groupId>com.ctrip.flight.backendservice.backofficetool.spider</groupId>
-            <artifactId>common</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>3.1</version>
         </dependency>
         <dependency>
-            <groupId>com.ctrip.flight.backendservice.backofficetool.spider</groupId>
+            <groupId>org.aminism.spider</groupId>
             <artifactId>dal</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -58,17 +39,27 @@
             <version>3.8.1</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.2.9.Final</version>
-            <scope>test</scope>
+            <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>5.2.9.Final</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.aminism.spider</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
