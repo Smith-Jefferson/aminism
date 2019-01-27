@@ -23,7 +23,7 @@ public class SpringBootTestInitializer extends SpringBootServletInitializer
     /**
      * Configure your application when it’s launched by the servlet container
      */
-    //@Override
+    @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(SpringBootTestInitializer.class);
     }

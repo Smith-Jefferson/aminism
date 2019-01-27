@@ -286,7 +286,12 @@ public class BloomFilter<E> implements Serializable {
      */
     public boolean contains(E element) {
         long hash;
-        String valString = element.toString();
+        String valString;
+        if(element instanceof String){
+            valString = (String) element;
+        }else{
+            valString = element.toString();
+        }
         for (int x = 0; x < k; x++) {
             hash = createHash(valString + Integer.toString(x));
             hash = hash % (long) bitSetSize;
@@ -296,7 +301,7 @@ public class BloomFilter<E> implements Serializable {
         return true;
     }
 
-    public boolean ContainedThenAdd(E element){
+    public boolean containedThenAdd(E element){
         if(contains(element)){
             return true;
         }

@@ -1,8 +1,6 @@
 package org.aminism.spider.strategy;
 
 import org.aminism.spider.service.InitailTask;
-import org.aminism.spider.connect.SessionPool;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,34 +9,31 @@ import org.junit.Test;
  */
 public class DoubanBookCommentTest {
     @Before
-    public void before() throws Exception{
-        InitailTask initailTask=new InitailTask();
+    public void before() throws Exception {
+        InitailTask initailTask = new InitailTask();
         initailTask.initailDoubanBook();
         initailTask.initailDoubanBookComment();
         initailTask.initailDoubanUser();
         initailTask.initialDoubanBookReview();
         initailTask.initialDoubanBookReviewComment();
     }
-    @After
-    public void after() throws Exception {
-        SessionPool.releaseDatabaseSource();
-    }
+
     @Test
-    public void testDoubanBookCommmentTest(){
-        DoubanBookComment commenttask=new DoubanBookComment("https://book.douban.com/subject/26910673/comments/");
-        commenttask.run();
+    public void testDoubanBookCommmentTest() {
+        DoubanBookComment commenttask = new DoubanBookComment();
+        commenttask.run("https://book.douban.com/subject/26910673/comments/");
     }
 
     @Test
-    public void testDoubanBookReview(){
-        DoubanBookReview reviewtask=new DoubanBookReview("https://book.douban.com/subject/26910673/reviews");
-        reviewtask.run();
+    public void testDoubanBookReview() {
+        DoubanBookReview reviewtask = new DoubanBookReview();
+        reviewtask.run("https://book.douban.com/subject/26910673/reviews");
     }
 
     @Test
-    public void testDoubanBookReviewComment(){
-        DoubanBookReviewComment reviewtask=new DoubanBookReviewComment("https://book.douban.com/review/1393458/");
+    public void testDoubanBookReviewComment() {
+        DoubanBookReviewComment reviewtask = new DoubanBookReviewComment();
         reviewtask.setBookid(1080370);
-        reviewtask.run();
+        reviewtask.run("https://book.douban.com/review/1393458/");
     }
 }

@@ -12,6 +12,7 @@ public class TaskUrlEntity {
     @Column(name = "url")
     private String url;
 
+    // tag:book,review,comment,
     @Basic
     @Column(name = "tag")
     private String tag;
@@ -24,6 +25,11 @@ public class TaskUrlEntity {
 
     public TaskUrlEntity(String url) {
         this.url = url;
+    }
+
+    public TaskUrlEntity(String url, String tag) {
+        this.url = url;
+        this.tag = tag;
     }
 
     public String getUrl() {

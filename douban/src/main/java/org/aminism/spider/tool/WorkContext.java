@@ -59,7 +59,7 @@ public class WorkContext {
         runWatch.stop();
         StringBuilder builder = new StringBuilder();
         logItems.forEach(x->builder.append(x));
-        if(orderId>0){
+        if(orderId!=null && orderId>0){
             CLogManager.info("日志总计",builder.toString(),Integer.toString(orderId));
         }
         CLogManager.info("日志总计",builder.toString());

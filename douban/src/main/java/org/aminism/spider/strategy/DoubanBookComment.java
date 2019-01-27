@@ -14,28 +14,32 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 
 /**
  * Created by hello world on 2017/1/13.
  */
-public class DoubanBookComment implements Runnable{
+@Component
+public class DoubanBookComment{
     private static final Logger log = LoggerFactory.getLogger(DoubanBookComment.class);
     @Autowired
     private DoubanDataRep doubanDataRep;
+    @Autowired
+    private UserElementAnalysis userElementAnalysis;
     private String url;
     private long bookID;
     private int pageCount=1;
     private int currentPage=1;
     private static int count=0;
-    private StringBuilder str=new StringBuilder();
-    public DoubanBookComment(String url) {
-        this.url = url;
+
+
+    public DoubanBookComment() {
     }
-    DoubanbookCommentEntity comment;
-    @Override
-    public void run() {
+
+
+    public void run(String url) {
         setBookid(url);
         try {
             task(url);
@@ -47,35 +51,8 @@ public class DoubanBookComment implements Runnable{
 
     public void task(String url){
         Document doc= SpiderTool.Getdoc(url,3,false);
-        Elements elements=doc.select("div#comments").select("li.comment-item");
-        UserEntity user;
-        Session session;
-        for (Element el:elements) {
-            comment=new DoubanbookCommentEntity();
-            user=new UserEntity();
-            comment.setId(++count);
-            user.setDoubanuserid(getDoubanuserid(el));
-            user.setUname(getUserName(el));
-            user.setAvatar(getUserAvatar(el));
-            user.setFlag(0);
-            long userid=doubanDataRep.getUserID(user);
-            try {
-                comment.setUserid(userid);
-                comment.setBookid(bookID);
-                comment.setDoubanuserid(user.getDoubanuserid());
-                comment.setRate(getRate(el));
-                comment.setComment(getComment(el));
-                comment.setRatedate(getRateDate(el));
-                comment.setFollownum(getFollownum(el));
-                if(!BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(comment.getDoubanuserid()).append(comment.getBookid()).toString())){
-                    doubanDataRep.saveComment(comment);
-                }
-            }catch (Exception e){
-                CLogManager.error(e);
-            }
-
-            str.delete(0,str.length());
-        }
+        ++count;
+        save(doc,this.bookID);
         log.info("记录短评条数："+count);
         pageCount=Integer.parseInt(SpiderTool.OnlyNo(SpiderTool.removeZh(doc.select("span#total-comments").text()).trim()));
         if(currentPage++<(int)Math.ceil((double)pageCount/(double) 20)){
@@ -88,17 +65,37 @@ public class DoubanBookComment implements Runnable{
         }
     }
 
+    public void save(Document doc,Long bookID) {
+        Elements elements=doc.select("div#comments").select("li.comment-item");
+        for (Element el:elements) {
+            DoubanbookCommentEntity comment=new DoubanbookCommentEntity();
+            try {
+                UserEntity user=doubanDataRep.getUser(
+                        getDoubanuserid(el),getUserName(el),getUserAvatar(el));
+                comment.setUserid(user.getUserid());
+                comment.setBookid(bookID);
+                comment.setDoubanuserid(user.getDoubanuserid());
+                comment.setRate(getRate(el));
+                comment.setComment(getComment(el));
+                comment.setRatedate(getRateDate(el));
+                comment.setFollownum(getFollownum(el));
+                doubanDataRep.saveComment(comment);
+            }catch (Exception e){
+                CLogManager.error(el.text(),e);
+            }
+        }
+    }
 
-    private String getUserAvatar(Element element){
-        return element.select("div.avatar").select("img").attr("src");
+    private String getDoubanuserid(Element element) {
+        return userElementAnalysis.getDoubanuserid(element.select("span.comment-info"));
     }
 
     private String getUserName(Element element){
-        return element.select("span.comment-info").select("a[href]").text();
+        return userElementAnalysis.getUserName(element.select("span.comment-info"));
     }
 
-    public String getDoubanuserid(Element element) {
-        return element.select("span.comment-info").select("a[href]").attr("abs:href").split("people/")[1].split("/")[0];
+    public String getUserAvatar(Element element){
+        return userElementAnalysis.getUserAvatar(element.select("div.avatar"));
     }
 
     public void setBookid(String url) {
@@ -106,17 +103,11 @@ public class DoubanBookComment implements Runnable{
         bookID=Long.valueOf(bookid);
     }
 
+    @Autowired
+    RateStartConvert rateStartConvert;
     public short getRate(Element element) {
         String evaluate=element.select("span.user-stars").attr("title");
-        short rate=0;
-        switch (evaluate){
-            case "力荐" : rate=5;break;
-            case "推荐" : rate=4;break;
-            case "还行" : rate=3;break;
-            case "较差" : rate=2;break;
-            case "很差" : rate=1;break;
-        }
-        return rate;
+        return rateStartConvert.convert(evaluate);
     }
 
     public String getComment(Element element) {

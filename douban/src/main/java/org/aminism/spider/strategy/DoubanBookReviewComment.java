@@ -20,7 +20,7 @@ import java.text.ParseException;
 /**
  * Created by hello world on 2017/1/16.
  */
-public class DoubanBookReviewComment implements Runnable{
+public class DoubanBookReviewComment{
     @Autowired
     private DoubanDataRep doubanDataRep;
     private static final Logger log = LoggerFactory.getLogger(DoubanBookReviewComment.class);
@@ -28,9 +28,8 @@ public class DoubanBookReviewComment implements Runnable{
     private String baseUrl;
     private long bookid;
     private int current=1;
-    public DoubanBookReviewComment(String url) {
-        baseUrl=url;
-        this.doc= SpiderTool.Getdoc(url,3,false);
+    public DoubanBookReviewComment() {
+
     }
 
     public DoubanBookReviewComment(Document doc) {
@@ -53,8 +52,9 @@ public class DoubanBookReviewComment implements Runnable{
         this.baseUrl = baseUrl;
     }
 
-    @Override
-    public void run() {
+    public void run(String url) {
+        baseUrl=url;
+        this.doc= SpiderTool.Getdoc(url,3,false);
         try {
             Thread.sleep(4000);
         }catch (Exception e){
@@ -76,7 +76,7 @@ public class DoubanBookReviewComment implements Runnable{
             }
         }
         while(max>current){
-            String url=baseUrl+"?start="+current*100;
+            url=baseUrl+"?start="+current*100;
             current++;
             try {
                 try {
@@ -104,14 +104,14 @@ public class DoubanBookReviewComment implements Runnable{
                 user.setAvatar(getAvatar(el));
                 user.setFlag(0);
                 user.setUname(getUserName(el));
-                long userid=doubanDataRep.getUserID(user);
+                long userid=doubanDataRep.getUser(user).getUserid();
                 commet.setBookid(getBookid());
                 commet.setReviewid(getReviewid());
                 commet.setUserid(userid);
                 commet.setDoubanuserid(doubanuserid);
                 commet.setComment(getComment(el));
                 commet.setRatedate(getRatedate(el));
-                if(!BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
+                if(!BloomFilterUtil.getBloomFilter().containedThenAdd(str.append(commet.getDoubanuserid()).append(commet.getBookid()).append(commet.getReviewid()).toString())){
                     doubanDataRep.saveReviewComment(commet);
                 }
                 str.delete(0,str.length());

@@ -4,16 +4,15 @@ package org.aminism.spider.dao;
 import org.aminism.spider.entity.*;
 import org.aminism.spider.log.BloomFilterUtil;
 import org.aminism.spider.log.CLogManager;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by hello world on 2017/1/11.
@@ -23,127 +22,135 @@ public class DoubanDataRep {
 
     @Autowired
     DoubanbookDao doubanbookDao;
-    public List<Long> getDoubanBook(){
-        doubanbookDao.findAll()
+    @Autowired
+    DoubanbookCommentDao doubanbookCommentDao;
+    @Autowired
+    DoubanbookReviewDao doubanbookReviewDao;
+    @Autowired
+    DoubanbookReviewCommentDao doubanbookReviewCommentDao;
+    @Autowired
+    UserDao userDao;
 
-        String HSQL="select bookid from DoubanbookEntity";
-        Query<Long> query = getSession().createQuery(HSQL,Long.class);
-        return query.getResultList();
+    public List<Long> getDoubanBook() {
+        return doubanbookDao.findAll().stream().map(DoubanbookEntity::getBookid).collect(Collectors.toList());
     }
 
-    public List<DoubanbookCommentEntity> getDoubanbookComment(){
-        String HSQL="from DoubanbookCommentEntity";
-        return getSession().createQuery(HSQL,DoubanbookCommentEntity.class).list();
+    public List<DoubanbookCommentEntity> getDoubanbookComment() {
+        return doubanbookCommentDao.findAll();
     }
 
-    public  List<DoubanbookReviewEntity> getDoubanbookReview(){
-        String HSQL="from DoubanbookReviewEntity";
-        return getSession().createQuery(HSQL,DoubanbookReviewEntity.class).list();
+    public List<DoubanbookReviewEntity> getDoubanbookReview() {
+        return doubanbookReviewDao.findAll();
     }
 
-    public  List<DoubanbookReviewCommentEntity> getDoubanbookReviewCommet(){
-        String HSQL="from DoubanbookReviewCommentEntity";
-        return getSession().createQuery(HSQL,DoubanbookReviewCommentEntity.class).list();
+    public List<DoubanbookReviewCommentEntity> getDoubanbookReviewCommet() {
+        return doubanbookReviewCommentDao.findAll();
     }
 
-    public List<UserEntity> getDoubanUser(){
-        String HSQL="from UserEntity";
-        return getSession().createQuery(HSQL,UserEntity.class).list();
+    public List<UserEntity> getDoubanUser() {
+        return userDao.findAll();
     }
 
-    public List<UserEntity> getUsersByName(String username,String doubanid){
-        String HSQL ="from UserEntity where uname=:username and doubanuserid=:doubanid";
-        Query<UserEntity> query =  getSession().createQuery(HSQL,UserEntity.class);
-        query.setParameter("username",username);
-        query.setParameter("doubanid",doubanid);
-        return query.getResultList();
+    public List<UserEntity> getUsersByName(String username, String doubanid) {
+        return userDao.queryByUnameAndDoubanuserid(username, doubanid);
     }
 
-    public long getUserID(UserEntity user){
-        StringBuilder str=new StringBuilder();
-        long userid=0;
-        if(BloomFilterUtil.getBloomFilter().ContainedThenAdd(str.append(user.getDoubanuserid()).append(user.getUname()).toString())){
-            List<UserEntity> tmp= getUsersByName(user.getUname(),user.getDoubanuserid());
-            if(tmp!=null && !tmp.isEmpty())
-                userid= tmp.get(0).getUserid();
+    @Cacheable(value = "user",key = "#p0")
+    public UserEntity getUser(String doubanuserid,String uname,String avatar){
+        UserEntity user=new UserEntity();
+        user.setDoubanuserid(doubanuserid);
+        user.setUname(uname);
+        user.setAvatar(avatar);
+        user.setFlag(0);
+        return getUser(user);
+    }
+
+    @Cacheable(value = "user",key = "#p0.doubanuserid")
+   public UserEntity getUser(UserEntity user) {
+        List<UserEntity> tmp = getUsersByName(user.getUname(), user.getDoubanuserid());
+        if (tmp != null && !tmp.isEmpty()) {
+            UserEntity u = tmp.get(0);
+            if(StringUtils.isBlank(u.getAvatar()) && StringUtils.isNotBlank(user.getAvatar())){
+                u.setAvatar(user.getAvatar());
+                return userDao.save(user);
+            }
+            return u;
         }
-        if(userid==0)
-        {
-            userid=saveUser(user);
-        }
-        str.delete(0,str.length());
-        return userid;
+       return userDao.save(user);
+
+   }
+
+    public long saveUser(UserEntity user) {
+        return userDao.save(user).getUserid();
     }
 
-    @Transactional
-    public long saveUser(UserEntity user){
-        getSession().save(user);
-        return user.getUserid();
+
+    @Cacheable(value = "comment",key = "#p0.doubanuserid.concat('_').concat(#p0.bookid).concat('_').concat(#p0.ratedate)")
+    public DoubanbookCommentEntity saveComment(DoubanbookCommentEntity comment) {
+        return doubanbookCommentDao.save(comment);
     }
 
-    @Transactional
-    public void saveComment(DoubanbookCommentEntity comment){
-        getSession().save(comment);
+    public void saveOrUpdateBookDerail(DoubanbookEntity detail) {
+        doubanbookDao.save(detail);
     }
 
-    @Transactional
-    public void saveOrUpdateBookDerail(DoubanbookEntity detail){
-        if(BloomFilterUtil.getBloomFilter().ContainedThenAdd(detail.getBookid())){
-            getSession().update(detail);
-        }else{
-            getSession().save(detail);
-        }
+    @Autowired
+    DoubanbookOfferDao doubanbookOfferDao;
+
+    public void saveBookOffer(DoubanbookOfferEntity offer) {
+        doubanbookOfferDao.save(offer);
     }
 
-    @Transactional
-    public void saveBookOffer(DoubanbookOfferEntity offer){
-        getSession().save(offer);
+    public void saveReview(DoubanbookReviewEntity bookreview) {
+        doubanbookReviewDao.save(bookreview);
     }
 
-    @Transactional
-    public void saveReview(DoubanbookReviewEntity bookreview){
-        getSession().save(bookreview);
+
+    public void saveReviewComment(DoubanbookReviewCommentEntity commet) {
+        doubanbookReviewCommentDao.save(commet);
     }
 
-    @Transactional
-    public void saveReviewComment(DoubanbookReviewCommentEntity commet){
-        getSession().save(commet);
-    }
+    @Autowired
+    TaskUrlDao taskUrlDao;
 
-    @Transactional
-    public void saveTaskUrl(TaskUrlEntity url){
-        if(getSession().find(url.getClass(),url.getUrl())!=null)
+    public void saveTaskUrl(TaskUrlEntity url) {
+        if (taskUrlDao.queryTop1ByUrl(url.getUrl()) != null)
             return;
-        getSession().save(url);
+        taskUrlDao.save(url);
     }
 
-    public List<String> listTaskUrl(){
-        String HSQL="select url from TaskUrlEntity";
-        return getSession().createQuery(HSQL,String.class).list();
+    public List<String> listTaskUrl() {
+        return taskUrlDao.findAll().stream().map(TaskUrlEntity::getUrl).collect(Collectors.toList());
     }
 
-    public void deleteTaskUrl(String url){
-        getSession().delete(new TaskUrlEntity(url));
+    public void deleteTaskUrl(String url) {
+        TaskUrlEntity v = taskUrlDao.queryTop1ByUrl(url);
+        if (v != null) {
+            taskUrlDao.delete(v);
+        }
     }
 
-    public void addToSchedule(Elements books){
-        if(books==null)return;
-        for (Element book:books) {
-            if(book==null)return;
+    public void addToSchedule(Elements books) {
+        if (books == null) {
+            return;
+        }
+        for (Element book : books) {
+            if (book == null) return;
             addToSchedule(book);
         }
     }
-    public void addToSchedule(Element book){
-        String url=book.attr("abs:href");
+
+    public void addToSchedule(Element book) {
+        String url = book.attr("abs:href");
         addToSchedule(url);
     }
 
-    public void addToSchedule(String url){
-        if(isBookUrl(url)){
+    public void addToSchedule(String url) {
+        if (isBookUrl(url)) {
             try {
-                String bookid=url.split("subject/")[1].split("/")[0];
-                url="https://book.douban.com/subject/"+bookid;
-                if(!BloomFilterUtil.getBloomFilter().contains(bookid)){
+                String bookid = url.split("subject/")[1].split("/")[0];
+                url = "https://book.douban.com/subject/" + bookid;
+                if (!BloomFilterUtil.getBloomFilter().contains(bookid)) {
                     saveTaskUrl(new TaskUrlEntity(url));
                 }
             } catch (Exception e) {
@@ -152,8 +159,8 @@ public class DoubanDataRep {
         }
     }
 
-    public static boolean isBookUrl(String url){
-        if (url!=null&&url.contains("book") && url.contains("com/subject"))
+    public static boolean isBookUrl(String url) {
+        if (url != null && url.contains("book") && url.contains("com/subject"))
             return true;
         return false;
     }
