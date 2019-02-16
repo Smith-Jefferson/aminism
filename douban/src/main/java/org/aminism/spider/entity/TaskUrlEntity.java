@@ -21,6 +21,18 @@ public class TaskUrlEntity {
     @Column(name = "source")
     private String source;
 
+    @Basic
+    @Column(name="isdel")
+    private int isdel;
+
+    public int getIsdel() {
+        return isdel;
+    }
+
+    public void setIsdel(int isdel) {
+        this.isdel = isdel;
+    }
+
     public TaskUrlEntity(){}
 
     public TaskUrlEntity(String url) {

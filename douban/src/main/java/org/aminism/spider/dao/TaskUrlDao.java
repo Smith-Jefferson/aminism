@@ -12,4 +12,8 @@ public interface TaskUrlDao extends JpaRepository<TaskUrlEntity,Long> {
     TaskUrlEntity queryTop1ByUrl(String url);
 
     List<TaskUrlEntity> queryAllByTag(String tag);
+
+    TaskUrlEntity queryTop1ByTagNotLikeAndAndIsdel(String tag,int isdel);
+
+
 }

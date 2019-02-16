@@ -13,6 +13,7 @@ import org.aminism.spider.service.LogManager;
 import org.aminism.spider.tool.DateUtil;
 import org.aminism.spider.tool.SpiderTool;
 import org.apache.commons.collections.CollectionUtils;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -36,6 +37,11 @@ public class DoubanBookDetail {
     private DoubanDataRep doubanDataRep;
     @Autowired
     DouBanBookReadNoteServer readNoteServer;
+
+    public void runHtml(String html,String url) throws Exception {
+        Document doc = Jsoup.parse(html);
+        task(url,doc );
+    }
 
     public void run(String url) {
         try {
